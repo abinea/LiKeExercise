@@ -12,7 +12,12 @@ export function setStorage(key: string, value: any) {
  * @returns localStorage的值,如果不存在则返回null
  */
 export function getStorage(key: string) {
-  return JSON.parse(localStorage.getItem(key)) || ""
+  const value = localStorage.getItem(key)
+  if (value) {
+    return JSON.parse(value)
+  } else {
+    return ("")
+  }
 }
 
 /**

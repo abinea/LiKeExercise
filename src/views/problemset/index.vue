@@ -1,69 +1,113 @@
 <script setup lang="ts">
 import Random from '@/components/Random.vue';
-import { ECharts, EChartsOption, init } from 'echarts';
-import { difficultyMap, problemStore } from '@/store/problem';
+import { message } from "ant-design-vue"
+import { ECharts, EChartsOption, init, registerCoordinateSystem } from 'echarts';
+import { difficultyArr, problemStore } from '@/store/problem';
+import { Problem } from "@/types/store"
+import type { ColumnsType } from 'ant-design-vue/es/table/interface';
+import { userStore } from '@/store/user';
 
 const store = problemStore()
 // const router = useRouter()
+const role = userStore().userInfo.role || 1
+console.log("role", role);
 
-// 筛选参数
-const filters = reactive({
-  title: '',
-  category: "",
-  difficulty: '',
-  tags: [],
-  courseName: '',
-  limit: 20,
-  offset: 0
-})
 
-watch(() => filters, () => {
-  store.filter(filters).then(res => {
-    problemList.value = res
-  })
-}, { deep: true })
+const problemList = ref<Problem.problem[]>([])
 
-// 题目列表展示
-const columns = [{
+// 表格列配置
+const columns: ColumnsType = [{
   title: '编号',
   dataIndex: 'id',
-  key: 'id',
   width: '100px',
-
 }, {
   title: '题目',
   dataIndex: 'title',
-  key: 'title',
   width: "20%"
 }, {
   title: '课程',
   dataIndex: 'courseName',
-  key: 'courseName',
   width: "180px"
 }, {
   title: '类型',
   dataIndex: 'category',
-  key: 'category',
   width: "120px"
 }, {
   title: '通过人数',
   dataIndex: 'Cnt',
-  key: 'Cnt',
   width: "120px"
 }, {
   title: '难度',
   dataIndex: 'difficulty',
-  key: 'difficulty',
   width: "100px"
-},
-  // {
-  //   title: '状态',
-  //   dataIndex: 'status',
-  //   key: 'status',
-  //   width: "160px"}
-]
+}]
+if (role === 2) {
+  columns.push({
+    title: '状态',
+    dataIndex: 'pass',
+    width: "90px",
+    align: "center"
+  }, {
+    title: '收藏',
+    dataIndex: 'favour',
+    width: "90px",
+    align: "center"
+  },)
+} else {
+  columns.push({
+    title: "操作",
+    dataIndex: "actions",
+    width: "180px",
+    align: "center"
+  })
+}
 
+// 筛选参数
+// TODO: 修复筛选
+const filters = reactive({
+  "category": "", // 题目类型
+  "courseName": "", // 课程
+  "searcherKeyWords": "", // 题目 或 题目id
+  "orders": [{
+    "orderBy": "cnt", // 按通过数排序
+    "sortOrder": "DESC" // 降序
+  }],
+  "tag": "", // 标签
+  "offset": 0, // 偏移
+  "limit": 20 // 分页大小
+})
+watch(() => filters, () => {
+  store.list(filters).then(res => {
+    problemList.value = res
+  })
+}, { deep: true })
 
+// 搜索框
+function onSearch(value: string) {
+  filters.searcherKeyWords = value
+}
+
+// 排序
+const orders = ref([
+
+])
+
+// TODO: 修复difficulty筛选（后端）
+const difficultyFilter = ref('')
+watch(difficultyFilter, (val) => {
+  store.filter(val).then(res => {
+    problemList.value = res
+  })
+})
+function difficultyColor(difficulty: string) {
+  switch (difficulty) {
+    case "简单": return "easy"
+    case "中等": return "medium"
+    case "困难": return "hard"
+  }
+}
+
+// 分页控制
 // const pagination = {
 //   pageSize: 20, // 默认每页显示数量
 //   showQuickJumper: true,
@@ -73,33 +117,24 @@ const columns = [{
 //     console.log(current, pageSize)
 //   } // 改变每页数量时更新显示
 // }
-// 搜索框
-function onSearch(value: string) {
-  filters.title = value
-}
 
-// tabs 选项卡
-const tabsMap = {
-  "1": "全部",
-  "2": "代码",
-  "3": "选择",
-  "4": "填空",
-  "5": "大题"
-}
-const activeKey = ref('1')
-function changeActiveKey(activeKey: keyof typeof tabsMap) {
-  if (activeKey === "1") {
+// 课程类型选择
+const categoryArr: string[] = ["全部", "代码", "选择", "填空", "大题"]
+const currentCategory = ref("全部")
+function changeCategory(category: string) {
+  console.log(category);
+  if (category === "全部") {
     filters.category = ""
   } else {
-    filters.category = tabsMap[activeKey]
+    filters.category = category
   }
 }
 
 // 标签选择
 const tags = reactive({
-  difficulty: Object.values(difficultyMap),
   tag: [],
-  courseName: ['软件工程', '数据结构', '程序设计', '面向对象']
+  // TODO: 获取课程列表
+  courseName: ['软件工程', '数据结构', '程序设计', '计算机网络']
 })
 onBeforeMount(async () => {
   const tag: any = await store.tags()
@@ -111,10 +146,10 @@ const handleChange = (type: string, value: any) => {
   value = value || ''
   switch (type) {
     case 'difficulty':
-      filters.difficulty = value;
+      difficultyFilter.value = value;
       break;
     case 'tag':
-      filters.tags = [{ 'tagName': value }];
+      filters.tag = value;
       break;
     case 'courseName':
       filters.courseName = value;
@@ -122,6 +157,34 @@ const handleChange = (type: string, value: any) => {
   }
 };
 
+// 收藏
+function handleFavour(row: any) {
+  console.log(row.id);
+  const id = row.id
+
+  if (row.favour) {
+    store.cancelFavour(id).then(res => {
+      console.log(res);
+      message.success("取消收藏", 0.5)
+    })
+  } else {
+    store.favour(id).then(res => {
+      console.log(res);
+      message.success("收藏成功", 0.5)
+    })
+  }
+  row.favour = !row.favour
+}
+
+// [老师] 操作
+function handleDelete(id: number) {
+  store.delete(id).then(async res => {
+    problemList.value = await store.list(filters)
+    message.success("删除成功")
+  }).catch(err => {
+    message.error("删除失败，" + err);
+  })
+}
 
 // 标签展示
 // const tagsFilter = ref<string[]>([])
@@ -137,11 +200,10 @@ const handleChange = (type: string, value: any) => {
 //   //   if (filters[p] == condition) {
 //   //     filters[p] = ''
 //   //   }
-
 // };
 
 // ECharts图表
-const chartData: any = {
+const chartData = {
   difficulty: [{
     value: 0, name: '简单'
   }, {
@@ -197,22 +259,23 @@ const option: EChartsOption = {
   ]
 };
 const cardActiveKey = ref('difficulty')
-let chartEch: any
+let chartEch: ECharts
 const changeChart = (val: any) => {
   console.log(val);
   // @ts-ignore
   option.series[0].data = chartData[val]
   chartEch.setOption(option as unknown, true);
 }
-const problemList = ref<any[]>([])
+// 加载数据
 onBeforeMount(async () => {
-  problemList.value = await store.all() as any
+  problemList.value = await store.list() as any
+  message.success("请求成功", 2)
+  hotProblemList.value = getStorage('problem') || []
   problemList.value.forEach((item: any) => {
-    const dindex = Object.values(difficultyMap).indexOf(item.difficulty)
+    const dindex = difficultyArr.indexOf(item.difficulty)
     if (dindex === -1) return
     chartData.difficulty[dindex].value++
     const cindex = chartData.category.map((cate: any) => cate['name']).indexOf(item.category)
-    console.log(chartData.category.map((cate: any) => cate['name']), (item.difficulty));
 
     if (cindex === -1) return
     chartData.category[cindex].value++
@@ -223,47 +286,67 @@ onBeforeMount(async () => {
 
 // 热门题目
 const hotProblemList = ref([])
-hotProblemList.value = getStorage('problem') || []
 </script>
 
 <template>
   <div class="problemset">
-    <AInputSearch placeholder="搜索题目名称" allowClear style="width:20em" @search="onSearch" />
+    <section>
+      <AInputSearch placeholder="搜索题目名称" allowClear style="width:20em" @search="onSearch" />
+      <ASpace style="margin-left: 20px;">
+        <a-select allowClear placeholder="难度" @change="handleChange('difficulty', $event)" class="tagSelect">
+          <a-select-option v-for="difficulty in difficultyArr" :value="difficulty">{{ difficulty }}
+          </a-select-option>
+        </a-select>
+        <a-select allowClear placeholder="标签" @change="handleChange('tag', $event)" class="tagSelect">
+          <a-select-option v-for="tag in tags.tag" :value="tag">{{ tag }}</a-select-option>
+        </a-select>
+        <a-select allowClear placeholder="课程" @change="handleChange('courseName', $event)" class="tagSelect">
+          <a-select-option v-for="courseName in tags.courseName" :value="courseName">{{ courseName }}
+          </a-select-option>
+        </a-select>
+      </ASpace>
+      <!-- <span v-for="condition in filters">
+        <a-tag closable @close="closeTag(condition)" v-if="condition" class="tags">
+          {{ condition }}
+        </a-tag>
+      </span> -->
+    </section>
     <div style="display: flex;">
-      <div style="margin-top: 30px;  flex:1 0 auto;margin-right: 20px;">
-        <a-tabs v-model:activeKey="activeKey" @change="changeActiveKey" class="problemTabs">
-          <a-tab-pane v-for="item, index in tabsMap" :key="index" :tab="item">
+      <div style="margin-top: 20px;  flex:1 0 auto;margin-right: 30px;">
+        <a-tabs v-model:activeKey="currentCategory" @change="changeCategory" style="display:inline-block;">
+          <a-tab-pane v-for="category in categoryArr" :key="category" :tab="category">
           </a-tab-pane>
         </a-tabs>
-        <section>
-          <a-select allowClear placeholder="难度" @change="handleChange('difficulty', $event)" class="tagSelect">
-            <a-select-option v-for="difficulty in tags.difficulty" :value="difficulty">{{ difficulty }}
-            </a-select-option>
-          </a-select>
-          <a-select allowClear placeholder="标签" @change="handleChange('tag', $event)" class="tagSelect">
-            <a-select-option v-for="tag in tags.tag" :value="tag">{{ tag }}</a-select-option>
-          </a-select>
-          <a-select allowClear placeholder="课程" @change="handleChange('courseName', $event)" class="tagSelect">
-            <a-select-option v-for="courseName in tags.courseName" :value="courseName">{{ courseName }}
-            </a-select-option>
-          </a-select>
-          <span class="right flex-center" style="color:#7B88FF;margin-right: 40px;">
-            <span class="random shadow">
-              <Random color="#fff" />
-            </span>随机一题
-          </span>
-          <!-- <span v-for="condition in filters">
-            <a-tag closable @close="closeTag(condition)" v-if="condition" class="tags">
-              {{ condition }}
-            </a-tag>
-          </span> -->
-        </section>
-        <main style="margin-top:20px;">
-          <div>
-            <a-table :columns="columns" :data-source="problemList">
-            </a-table>
-          </div>
-        </main>
+        <span class="right" style="display:flex;align-items: center;margin-top:5px; margin-right:60px;color:#7B88FF;">
+          <span class="random shadow">
+            <Random color="#fff" />
+          </span>随机一题
+        </span>
+        <a-table :columns="columns" :data-source="problemList">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.dataIndex === 'difficulty'">
+              <div :class="difficultyColor(record.difficulty)">
+                {{ record.difficulty }}
+              </div>
+            </template>
+            <template v-else-if="column.dataIndex === 'pass'">
+              <check-outlined v-if="record.pass" style="color: #81B337" />
+            </template>
+            <template v-else-if="column.dataIndex === 'favour'">
+              <div @click="handleFavour(record)">
+                <StarFilled class="favour icon" v-if="record.favour" />
+                <StarOutlined class="favour icon" v-else />
+              </div>
+            </template>
+            <template v-else-if="column.dataIndex === 'actions'">
+              <RouterLink :to="{ name: 'EditProblem', query: { id: record.id, title: record.title } }">修改</RouterLink>
+              <ADivider type="vertical" />
+              <a-popconfirm v-if="problemList.length" title="确定删除？" @confirm="handleDelete(record.id)">
+                <a>删除</a>
+              </a-popconfirm>
+            </template>
+          </template>
+        </a-table>
       </div>
       <div class="card-container">
         <div class=" top card shadow">
@@ -362,5 +445,23 @@ hotProblemList.value = getStorage('problem') || []
   border-radius: 50%;
   background-color: #7B88FF;
   margin-right: 6px;
+}
+
+
+// 难度颜色
+.easy {
+  color: #81B337
+}
+
+.medium {
+  color: #E99D42
+}
+
+.hard {
+  color: #BD3124
+}
+
+.favour {
+  color: #FFBF6B;
 }
 </style>

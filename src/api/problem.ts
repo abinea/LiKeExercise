@@ -1,13 +1,11 @@
+import { Problem } from "@/types/store"
 import service from "./service"
 
-function problemAll(data = {
-  offset: 0,
-  limit: 20
-}) {
+function problemList(data: any): Promise<Problem.problem[]> {
   return service({
     method: "POST",
-    url: "/v1/problem/all",
-    data
+    url: "/v1/problem/allWithTag",
+    data,
   })
 }
 
@@ -26,17 +24,48 @@ function problemCreate(data: any) {
   })
 }
 
-function problemFilter(data: any) {
+function problemFavour(problemId: number) {
   return service({
-    method: "POST",
-    url: '/v1/problem/all',
-    data
+    method: "GET",
+    url: "/v1/problem/collection",
+    params: {
+      problemId,
+    },
+  })
+}
+
+function problemCancelFavour(problemId: number) {
+  return service({
+    method: "DELETE",
+    url: "/v1/problem/collection",
+    params: {
+      problemId,
+    },
+  })
+}
+
+function problemDelete(problemId: number) {
+  return service({
+    method: "DELETE",
+    url: `/v1/problem/${problemId}`,
+  })
+}
+/**
+ * 获取具体题目详情
+ */
+function problemDetail(title: string) {
+  return service({
+    method: "GET",
+    url: `/v1/problem/${title}`,
   })
 }
 
 export default {
-  problemAll,
+  problemList,
   problemCreate,
   problemTags,
-  problemFilter,
+  problemFavour,
+  problemCancelFavour,
+  problemDelete,
+  problemDetail,
 }

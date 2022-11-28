@@ -2,7 +2,6 @@ import router from './index'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { appTitle } from '@/store/appConfig'
-import { userStore } from '@/store/user'
 import { message } from 'ant-design-vue'
 
 NProgress.configure({ showSpinner: false })

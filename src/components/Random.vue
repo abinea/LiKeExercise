@@ -9,7 +9,7 @@ const props = defineProps({
 })
 </script>
 <template>
-  <a-space>
+  <span>
     <Icon>
       <template #component>
         <svg t=" 1668511884527" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -21,5 +21,5 @@ const props = defineProps({
         </svg>
       </template>
     </Icon>
-  </a-space>
+  </span>
 </template>

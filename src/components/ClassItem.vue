@@ -7,7 +7,7 @@ const classInfo = {
   title: `软件工程${props.classIndex}班`,
   grade: '2020',
   classId: "2021-01-01-01",
-  studentNum: 30,
+  studentNum: getRandom(20, 40),
 }
 const navigateToClassDetail = () => { }
 </script>

@@ -3,6 +3,7 @@ import type { UnwrapRef } from 'vue';
 import { FormProps, message } from 'ant-design-vue';
 import { LoginForm } from '@/types/request';
 import { userStore } from "@/store/user";
+import { remove } from 'nprogress';
 
 const store = userStore()
 const router = useRouter();
@@ -22,6 +23,8 @@ const handleFinish: FormProps['onFinish'] = () => {
   if (remember.value) {
     // TODO: 加密密码
     setStorage('password', loginForm.password);
+  } else {
+    removeStorage('password')
   }
   // 提交数据
   store.login(loginForm).then(res => {

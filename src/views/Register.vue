@@ -77,7 +77,7 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
         <LeftOutlined /> 返回登录
       </a>
       <div class="register-header">用户注册</div>
-      <AForm ref="register" class="register-form" :rules="rules" :model="registerForm" @finish="handleFinish"
+      <AForm ref="registerRef" class="register-form" :rules="rules" :model="registerForm" @finish="handleFinish"
         @finishFailed="handleFinishFailed">
         <AFormItem name="email" has-feedback>
           <AInput size="large" v-model:value="registerForm.email" placeholder="邮箱">

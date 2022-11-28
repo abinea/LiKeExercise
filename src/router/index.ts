@@ -12,7 +12,7 @@ import {
 export const dashboardRoute: RouteRecordRaw = {
   path: "/",
   component: Layout,
-  redirect: "/login",
+  redirect: "/home",
   meta: { breadcrumb: false },
   children: [
     {
@@ -30,6 +30,7 @@ export const dashboardRoute: RouteRecordRaw = {
     },
     {
       path: "/edit",
+      name: "EditProblem",
       component: () => import("@/views/edit/index.vue"),
       meta: { title: "编辑题目", icon: FormOutlined },
     },
@@ -67,21 +68,24 @@ const baseRoutes: RouteRecordRaw[] = [
   {
     path: "/login",
     meta: {
-      hidden: true, title: "登陆页面"
+      hidden: true,
+      title: "登陆页面",
     },
     component: () => import("@/views/Login.vue"),
   },
   {
     path: "/forget",
     meta: {
-      hidden: true, title: "重置密码"
+      hidden: true,
+      title: "重置密码",
     },
     component: () => import("@/views/Forget.vue"),
   },
   {
     path: "/register",
     meta: {
-      hidden: true, title: "注册页面"
+      hidden: true,
+      title: "注册页面",
     },
     component: () => import("@/views/Register.vue"),
   },
@@ -89,7 +93,8 @@ const baseRoutes: RouteRecordRaw[] = [
   {
     path: "/404",
     meta: {
-      hidden: true, title: "不存在"
+      hidden: true,
+      title: "不存在",
     },
     component: () => import("@/views/404.vue"),
   },

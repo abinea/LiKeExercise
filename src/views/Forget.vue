@@ -59,10 +59,12 @@ const current = ref(0)
 const isNext = ref(false)
 const nextStep = () => {
   isNext.value = true
+  current.value++
   message.success("验证成功", 1.5)
 };
 function reset() {
   store.resetPassword({ email: resetForm.email, newPasswd: resetForm.password }).then(res => {
+    current.value++
     message.loading("重置成功，跳转中...", 1.5).then(() => {
       router.push("/login");
     });
@@ -80,7 +82,7 @@ function reset() {
       <AForm class="register-form" :model="resetForm" @finish="handleFinish" @finishFailed="handleFinishFailed">
         <AFormItem style="padding-bottom: 20px;">
           <a-steps :current="current" size="small">
-            <a-step v-for="item in steps" :key="item.title" :title="item.title" />
+            <a-step v-for="item, index in steps" :key="index" :title="item.title" />
           </a-steps>
         </AFormItem>
         <AFormItem name="email">

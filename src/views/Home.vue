@@ -25,7 +25,6 @@ function searchSelect(value: any) {
   router.push(value)
 }
 
-
 const activeKey = ref('1') // 默认进行中
 
 </script>
@@ -34,7 +33,7 @@ const activeKey = ref('1') // 默认进行中
   <div class="home">
     <AAutoComplete v-model:value="searchValue" style="width: 10rem" :dropdownMatchSelectWidth="250"
       :filterOption="false" :options="searchOptions" @change="searchChange" @select="searchSelect">
-      <AInputSearch placeholder="搜索班级名称、编号" allowClear style="width:20em" />
+      <AInputSearch placeholder="搜索班级名称" allowClear style="width:20em" />
       <template #option="item">
         <ABreadcrumb v-if="item.matched.length > 0">
           <template v-for="(route, index) in item.matched" :key="route.path">
@@ -59,17 +58,17 @@ const activeKey = ref('1') // 默认进行中
       <a-tabs v-model:activeKey="activeKey">
         <a-tab-pane key="1" tab="进行中">
           <div class="class-container">
-            <ClassItem v-for="item in 12" :classIndex="item" />
+            <ClassItem v-for="item in 3" :classIndex="item" />
           </div>
         </a-tab-pane>
         <a-tab-pane key="2" tab="已结束">
           <div class="class-container">
-            <ClassItem v-for="item in 12" :classIndex="item" />
+            <ClassItem v-for="item in 2" :classIndex="item" />
           </div>
         </a-tab-pane>
         <a-tab-pane key="3" tab="所有班级">
           <div class="class-container">
-            <ClassItem v-for="item in 24" :classIndex="item" />
+            <ClassItem v-for="item in 5" :classIndex="item" />
           </div>
         </a-tab-pane>
       </a-tabs>

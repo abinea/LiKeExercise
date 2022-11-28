@@ -15,10 +15,11 @@ export const userStore = defineStore("user", {
       password: "", // 密码
       username: "", // 实名
       schoolId: 0, // 学号/教工号
-      role: roleMap,
+      role: 0,
       gender: "", // 性别
       avatar: "", // 头像路径，有默认头像
     },
+    token: "",
   }),
   actions: {
     setUserInfo(userInfo: any) {
@@ -28,6 +29,7 @@ export const userStore = defineStore("user", {
       console.log("login ", data)
       const res: any = await user.login(data)
       setCookie("token", res.token)
+      this.token = res.token
     },
     logout() {
       removeCookie("token")
@@ -37,7 +39,7 @@ export const userStore = defineStore("user", {
       const registerData: any = toRaw(data)
       registerData.schoolId = Number(data.sid)
       const res: any = await user.register(registerData)
-      console.log(res,data);
+      console.log(res, data)
       res.password = data.password
       this.setUserInfo(res)
     },

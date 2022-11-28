@@ -1,12 +1,29 @@
 <script setup lang="ts">
-import router from '@/router';
-import { difficultyMap, problemStore } from '@/store/problem';
+import { difficultyArr, problemStore } from '@/store/problem';
 import { message } from 'ant-design-vue';
+import { Problem } from "@/types/store"
+
 const store = problemStore()
 
 const type = ['选择', '填空', '大题']
 let tags = getStorage('tags') || []
-tags = tags?.map((item: any) => item['tagName'])
+tags = tags.map((item: Problem.Tag) => item['tagName'])
+
+
+const isSelectProblem = computed(() => {
+  return problem.category == type[0]
+})
+const isDati = computed(() => {
+  return problem.category == type[2]
+})
+
+const title = useRoute().query?.title as string
+let detail
+if (title != undefined) {
+  store.detail(title).then(res => {
+    detail = res
+  })
+}
 const problem = reactive({
   title: '',
   question: "",
@@ -15,20 +32,10 @@ const problem = reactive({
   difficulty: "简单",
   tags: []
 })
-
 const selectTags = (tags: any[]) => {
   // @ts-ignore
   problem.tags = tags.map(val => ({ tagName: val }))
 }
-
-const difficulties = Object.values(difficultyMap)
-
-const isSelectProblem = computed(() => {
-  return problem.category == type[0]
-})
-const isDati = computed(() => {
-  return problem.category == type[2]
-})
 
 const ansContent = ref('')
 
@@ -45,12 +52,6 @@ const delAns = () => {
 function createProblem() {
   const isFinish = Object.values(problem).some((p: any) => p)
   if (isFinish) {
-    for (const p in difficultyMap) {
-      // @ts-ignore
-      if (difficultyMap.p == problem.difficulty) {
-        problem.difficulty = p
-      }
-    }
     store.create(problem)
   }
   else {
@@ -98,14 +99,14 @@ function createProblem() {
         <a-form name="Property">
           <a-form-item name="难度" label="难度">
             <a-select placeholder="请选择难度" v-model:value="problem.difficulty">
-              <a-select-option v-for="item in difficulties" :value="item">{{ item }}</a-select-option>
+              <a-select-option v-for="item in difficultyArr" :value="item">{{ item }}</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item name="课程" label="课程">
             <a-select placeholder="请选择课程" v-model:value="problem.courseName">
               <a-select-option value="软件工程">软件工程</a-select-option>
-              <a-select-option value="计算机网络">计算机网络</a-select-option>
-              <a-select-option value="计算机组成原理">计算机组成原理</a-select-option>
+              <a-select-option value="数据结构">数据结构</a-select-option>
+              <a-select-option value="计算机组成原理">程序设计</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item name="标签" label="标签">

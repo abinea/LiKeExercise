@@ -7,18 +7,16 @@ const service = axios.create({
   timeout: 5000,
 })
 
-const token = getCookie("token")
-
 service.interceptors.request.use(
   (req) => {
-    console.log(req.headers,token)
+    const token = getCookie("token")
     if (req.headers && token) {
-      req.headers["Authorization"] ='Bearer '+ token
+      req.headers["Authorization"] = "Bearer " + token
     }
     return req
   },
   (error) => {
-    console.error("request",error)
+    console.error("request", error)
     return Promise.reject(error)
   }
 )
@@ -31,7 +29,6 @@ service.interceptors.response.use(
       message.error(body.message || "请求失败，请检查数据是否正确", 2)
       return Promise.reject(new Error(body.message))
     } else {
-      message.success("请求成功", 2)
       return body
     }
   },
