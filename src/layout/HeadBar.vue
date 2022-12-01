@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import type { Layout } from '@/types/layout'
-import { userStore } from '@/store/user'
 
 const sidebarRelated = inject<Layout.SidebarRelated>('sidebarRelated')
 const loading = inject<Layout.Loading>('loading')
-const user = userStore()
 const router = useRouter()
 let timeout: NodeJS.Timeout
 
 function logout() {
   if (loading) loading.logout = true
-  user.logout()
+  removeCookie("token")
   router.replace('/login')
 }
 function toggleSidebar() {
@@ -44,7 +42,7 @@ function toggleSidebar() {
         <SettingOutlined />
         <ADivider type="vertical" style="background-color: #e1e1e1; height: 1rem; margin: 0" />
       </ASpace>
-      <div style="display: inline-flex; align-items: center; cursor:pointer;">
+      <div style="display: inline-flex; align-items: center; cursor:pointer; margin-right: 1rem;">
         <span @click="logout">
           <LogoutOutlined style="margin-right: .5rem;" /> 登出
         </span>

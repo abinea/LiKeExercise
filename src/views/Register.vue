@@ -1,26 +1,41 @@
 <script lang="ts" setup>
-import type { UnwrapRef } from 'vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import { FormProps, message } from 'ant-design-vue';
-import { RegisterForm } from '../types/request';
-import { userStore } from '@/store/user';
+import { RegisterForm } from '@/types/request';
+import { userStore } from '@/store';
+import userApi from '@/api/user';
 import { isEmail } from '@/utils/validate'
 
 const store = userStore()
 const router = useRouter();
 
-const registerRef = ref(null)
-const registerForm: UnwrapRef<RegisterForm> = reactive({
+// 注册表单
+const registerForm = reactive<RegisterForm>({
   email: "",
   sid: "",
   password: "",
   checkPass: "",
   username: "",
-  college: "",
   role: -1,
-  avatar: "",
 })
+const handleFinish: FormProps['onFinish'] = async () => {
+  const registerData: any = toRaw(registerForm)
+  registerData.schoolId = Number(registerData.sid)
+  const res: any = await userApi.register(registerData)
+  console.log(res)
+  if (!("code" in res)) {
+    res.password = registerData.password
+    store.setUserInfo(res)
+    await message.loading("完成注册，跳转中...", 0.5)
+    router.push("/login");
+  }
+};
+const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
+  console.log(errors);
+};
 
+// 验证规则
+const registerRef = ref(null)
 const validateEmail = async (_rule: Rule, value: string) => {
   const res = isEmail(value)
   if (res) {
@@ -29,8 +44,6 @@ const validateEmail = async (_rule: Rule, value: string) => {
     return Promise.reject('邮箱格式不正确');
   }
 };
-
-
 const validatePwd = async (_rule: Rule, value: string) => {
   if (value === '' || value.length < 8) {
     return Promise.reject('请输入8位密码，包括大小写字母和数字');
@@ -41,33 +54,29 @@ const validatePwd = async (_rule: Rule, value: string) => {
     return Promise.resolve();
   }
 };
-
 const validateCheckPass = async (_rule: Rule, value: string) => {
   if (value === '') {
     return Promise.reject('请重新输入相同的密码');
   } else if (value !== registerForm.password) {
-    return Promise.reject("重复输入的密码不匹配'");
+    return Promise.reject("重复输入的密码不匹配");
   } else {
     return Promise.resolve();
   }
 }
-
+const validateSid = async (_rule: Rule, value: string) => {
+  const num10Reg = /\d{10}/
+  if (num10Reg.test(value)) {
+    return Promise.resolve();
+  } else {
+    return Promise.reject('教工号或学号为10位数字');
+  }
+};
 const rules: Record<string, Rule[]> = {
   email: [{ validator: validateEmail, trigger: 'change' }],
   password: [{ validator: validatePwd, trigger: 'change' }],
   checkPass: [{ validator: validateCheckPass, trigger: 'change' }],
+  sid: [{ validator: validateSid, trigger: 'change' }],
 }
-
-const handleFinish: FormProps['onFinish'] = () => {
-  store.register(registerForm).then(() => {
-    message.loading("完成注册，跳转中...", 1.5).then(() => {
-      router.push("/login");
-    });
-  })
-};
-const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-  console.log(errors);
-};
 </script>
           
 <template>
@@ -109,22 +118,13 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
             </template>
           </AInput>
         </AFormItem>
-        <AFormItem name="sid">
-          <AInput size="large" v-model:value="registerForm.sid" placeholder="学号/教工号">
+        <AFormItem name="sid" has-feedback>
+          <AInput size="large" v-model:value="registerForm.sid" placeholder="学号/教工号" :maxlength="10">
             <template #prefix>
               <IdcardOutlined />
             </template>
           </AInput>
         </AFormItem>
-        <!-- <AFormItem name="college">
-          <AAutoComplete :options="options" v-model:value="registerForm.college" @select="onSelect">
-            <AInput size="large" placeholder="学院">
-              <template #prefix>
-                <BankOutlined />
-              </template>
-            </AInput>
-          </AAutoComplete>
-        </AFormItem> -->
         <AFormItem name="role">
           <span class="big left">选择身份：</span>
           <a-radio-group class="radio-group" v-model:value="registerForm.role">
@@ -134,10 +134,7 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
         </AFormItem>
         <AFormItem name="submit">
           <AButton class="register-form-button" size="large" type="primary" html-type="submit" :disabled="
-  registerForm.email === '' || registerForm.password === '' ||
-  registerForm.username === '' || registerForm.sid === '' ||
-  registerForm.role === -1
-          
+  Object.values(registerForm).some((filed: string | number) => filed === '' || filed === -1)
           ">
             注册
           </AButton>
@@ -209,19 +206,5 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
     }
   }
 
-}
-
-.agreement {
-  text-align: center;
-  font-size: 13px;
-  color: #A8A8B3;
-  position: absolute;
-  bottom: 24px;
-  white-space: nowrap;
-
-  a {
-    display: inline-block;
-    padding: 0 5px;
-  }
 }
 </style>

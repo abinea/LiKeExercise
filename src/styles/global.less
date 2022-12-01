@@ -1,6 +1,8 @@
+@import './variable.less';
+
 body {
   font-family: "PingFang SC", "微软雅黑", "黑体", Arial, Helvetica, sans-serif !important;
-  background-color: @login-background-color  !important;
+  background-color: @login-background-color !important;
 }
 
 #app {
@@ -46,4 +48,18 @@ body {
 .align-center {
   display: flex;
   align-items: center;
+}
+
+.agreement {
+  text-align: center;
+  font-size: 13px;
+  color: #A8A8B3;
+  position: absolute;
+  bottom: 24px;
+  white-space: nowrap;
+
+  a {
+    display: inline-block;
+    padding: 0 5px;
+  }
 }

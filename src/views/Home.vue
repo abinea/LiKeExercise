@@ -1,56 +1,111 @@
 <script setup lang="ts">
-import { DefaultOptionType, SelectValue } from 'ant-design-vue/es/select'
-const router = useRouter()
+import { userStore } from '@/store';
+import { SelectValue } from 'ant-design-vue/es/select'
+import { Modal } from 'ant-design-vue';
+
+const store = userStore()
+const role = store.userInfo.role
 
 const searchValue = ref('')
-const searchOptions = shallowRef<DefaultOptionType[]>([])
-const searchCache: Record<string, any> = {}
 function searchChange(value: SelectValue) {
-  if (!value) {
-    searchOptions.value = []
-    return
-  }
-  if (Reflect.has(searchCache, value as string)) {
-    searchOptions.value = searchCache[value as string]
-    return
-  }
-  const routes = router.getRoutes()
-  const filteredRoutes = routes.filter(route => !route.meta.hidden && (route.meta.title?.includes(value as string) || route.meta.searchKeywords?.some(keyword => keyword.includes(value as string))))
-  searchOptions.value = filteredRoutes.map(route => Object.assign(router.resolve(route), { value: route.path }))
-  searchCache[value as string] = searchOptions.value
+  console.log(value);
+}
+function searchSelect(value: SelectValue) {
+  console.log(value);
 }
 
-function searchSelect(value: any) {
-  searchValue.value = ''
-  router.push(value)
-}
+const classList = [{
+  title: "软件工程 01",
+  classId: "1",
+  term: "2022-2023-1",
+  studentNum: 33
+}, {
+  title: "数据库原理 02",
+  classId: "2",
+  term: "2022-2023-1",
+  studentNum: 34
+}, {
+  title: "自动机与形式语言 02",
+  term: "2022-2023-1",
+  classId: "3",
+  studentNum: 46
+}]
+const endedClass = [{
+  title: "面向对象程序设计 03",
+  classId: "1",
+  term: "2020-2021-2",
+  studentNum: 33
+}, {
+  title: "计算机系统2 02",
+  classId: "2",
+  term: "2021-2022-1",
+  studentNum: 34
+}, {
+  title: "计算机系统1 03",
+  classId: "3",
+  term: "2020-2021-1",
+  studentNum: 46
+}]
+
+const allClass = [...classList, ...endedClass]
 
 const activeKey = ref('1') // 默认进行中
 
+const modalVisible = ref<boolean>(false)
+function hideModal() {
+  modalVisible.value = false
+}
+function showModal() {
+  modalVisible.value = true
+}
+
+const classInfo = reactive({
+  title: "",
+  classId: "",
+  studentNum: 0,
+  term: '2022-2023-1',
+  course: "",
+  info: ""
+})
+
+const inviteCode = ref('')
 </script>
 
 <template>
   <div class="home">
+    <AModal v-model:visible="modalVisible" :title="role === 1 ? '添加班级' : '新建班级'" ok-text="确认" cancel-text="取消"
+      @ok="hideModal">
+      <AForm v-if="(role === 1)">
+        <AFormItem label="邀请码">
+          <AInput v-model:value="inviteCode" />
+        </AFormItem>
+      </AForm>
+      <AForm v-else>
+        <AFormItem label="班级名称">
+          <AInput v-model:value="classInfo.title" placeholder="请输入班级名称" />
+        </AFormItem>
+        <AFormItem label="课程名称">
+          <AInput v-model:value="classInfo.course" placeholder="请输入课程名称" />
+        </AFormItem>
+        <AFormItem label="课程介绍">
+          <ATextarea v-model:value="classInfo.info" placeholder="请输入课程介绍" :maxlength="100" />
+        </AFormItem>
+        <AFormItem label="开课学期">
+          <ASelect v-model:value="classInfo.term" placeholder="请选择学期">
+            <ASelectOption value="2022-2023-1">2022-2023学年第1学期</ASelectOption>
+            <ASelectOption value="2022-2023-2">2022-2023学年第2学期</ASelectOption>
+            <ASelectOption value="2023-2024-1">2023-2024学年第1学期</ASelectOption>
+          </ASelect>
+        </AFormItem>
+      </AForm>
+    </AModal>
     <AAutoComplete v-model:value="searchValue" style="width: 10rem" :dropdownMatchSelectWidth="250"
-      :filterOption="false" :options="searchOptions" @change="searchChange" @select="searchSelect">
+      :filterOption="false" @change="searchChange" @select="searchSelect">
       <AInputSearch placeholder="搜索班级名称" allowClear style="width:20em" />
-      <template #option="item">
-        <ABreadcrumb v-if="item.matched.length > 0">
-          <template v-for="(route, index) in item.matched" :key="route.path">
-            <ABreadcrumbItem v-if="route.meta.breadcrumb !== false && route.meta.title">
-              <template v-if="route.meta.icon">
-                <SvgIcon v-if="typeof route.meta.icon === 'string'" :iconName="(route.meta.icon as string)"></SvgIcon>
-                <component v-else :is="route.meta.icon"></component>
-              </template>
-              <span>&nbsp;{{ route.meta.title }}</span>
-            </ABreadcrumbItem>
-          </template>
-        </ABreadcrumb>
-      </template>
     </AAutoComplete>
     <div style="margin-top:40px;">
-      <AButton type="primary">
-        添加班级
+      <AButton type="primary" @click="showModal">
+        {{ role == 1 ? "添加班级" : '新建班级' }}
       </AButton>
     </div>
 
@@ -58,17 +113,17 @@ const activeKey = ref('1') // 默认进行中
       <a-tabs v-model:activeKey="activeKey">
         <a-tab-pane key="1" tab="进行中">
           <div class="class-container">
-            <ClassItem v-for="item in 3" :classIndex="item" />
+            <ClassItem v-for="item in classList" :classInfo="item" />
           </div>
         </a-tab-pane>
         <a-tab-pane key="2" tab="已结束">
           <div class="class-container">
-            <ClassItem v-for="item in 2" :classIndex="item" />
+            <ClassItem v-for="item in endedClass" :classInfo="item" />
           </div>
         </a-tab-pane>
         <a-tab-pane key="3" tab="所有班级">
           <div class="class-container">
-            <ClassItem v-for="item in 5" :classIndex="item" />
+            <ClassItem v-for="item in allClass" :classInfo="item" />
           </div>
         </a-tab-pane>
       </a-tabs>
@@ -88,7 +143,7 @@ const activeKey = ref('1') // 默认进行中
   margin-top: 10px;
   display: grid;
   justify-content: flex-start;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, 360px);
   grid-gap: 24px;
 }
 </style>

@@ -1,7 +1,8 @@
-import { LoginForm, RegisterForm, ResponseData } from "../types/request"
+import { User } from "@/types/store"
+import { LoginForm, MessageResponse, RegisterForm } from "@/types/request"
 import service from "./service"
 
-function login(data: LoginForm) {
+function login(data: LoginForm): Promise<MessageResponse | { token: string }> {
   return service({
     method: "POST",
     url: "/login",
@@ -17,14 +18,14 @@ function register(data: any) {
   })
 }
 
-function info() {
+function info(): Promise<User.userInfo> {
   return service({
     method: "GET",
-    url: "/info",
+    url: "/user/info",
   })
 }
 
-function resetCaptcha(params: { email: string }) {
+function resetCaptcha(params: { email: string }): Promise<MessageResponse> {
   return service({
     method: "GET",
     url: "/resetPasswd",
@@ -32,7 +33,7 @@ function resetCaptcha(params: { email: string }) {
   })
 }
 
-function resetValid(data: { email: string; captcha: string }) {
+function resetValid(data: { email: string; captcha: string }): Promise<MessageResponse> {
   return service({
     method: "POST",
     url: "/resetPasswd",
@@ -40,7 +41,7 @@ function resetValid(data: { email: string; captcha: string }) {
   })
 }
 
-function resetPassword(data: { email: string; newPasswd: string }) {
+function resetPassword(data: { email: string; newPasswd: string }): Promise<MessageResponse> {
   return service({
     method: "PUT",
     url: "/resetPasswd",
@@ -48,7 +49,7 @@ function resetPassword(data: { email: string; newPasswd: string }) {
   })
 }
 
-const user = {
+const userApi = {
   login,
   register,
   info,
@@ -57,4 +58,4 @@ const user = {
   resetPassword,
 }
 
-export default user
+export default userApi

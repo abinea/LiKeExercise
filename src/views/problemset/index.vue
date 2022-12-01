@@ -1,21 +1,104 @@
 <script setup lang="ts">
 import Random from '@/components/Random.vue';
 import { message } from "ant-design-vue"
-import { ECharts, EChartsOption, init, registerCoordinateSystem } from 'echarts';
-import { difficultyArr, problemStore } from '@/store/problem';
+import type { TableProps } from 'ant-design-vue/lib/table';
+import type { ColumnsType, TablePaginationConfig, SorterResult } from 'ant-design-vue/lib/table/interface';
+import { userStore, problemStore } from '@/store';
 import { Problem } from "@/types/store"
-import type { ColumnsType } from 'ant-design-vue/es/table/interface';
-import { userStore } from '@/store/user';
+import problemApi from "@/api/problem"
+
+const router = useRouter()
 
 const store = problemStore()
-// const router = useRouter()
-const role = userStore().userInfo.role || 1
-console.log("role", role);
+const { difficultyArr, categoryArr } = store
+const problemList = computed(() => store.problemList)
+const tags = computed(() => store.tags.map(tag => tag['tagName']))
+const courses = computed(() => store.courses)
+const hotList = ref<Problem.problem[]>([])
+// Echart饼图
+const { chartEle, changeChart, cardActiveKey, evaluteChartData } = useCharts()
 
+// 初始化数据
+onBeforeMount(async () => {
+  const problemList = await problemApi.problemList()
+  console.log(problemList);
+  store.setProblemList(problemList)
+  evaluteChartData(problemList)
+  const tags = await problemApi.problemTags()
+  store.setTags(tags)
+  hotList.value = await problemApi.problemList({
+    "orders": [{
+      "orderBy": "cnt", // 按通过数排序
+      "sortOrder": "DESC" // 降序
+    }],
+    "offset": 0, // 偏移
+    "limit": 10 // 分页大小
+  })
+  // TODO:课程列表
+})
 
-const problemList = ref<Problem.problem[]>([])
+// 筛选参数
+const filters = reactive<Problem.filters>({
+  category: "", // 题目类型
+  courseName: "", // 课程
+  searcherKeyWords: "", // 题目 或 题目id
+  orders: [{
+    orderBy: "id", // 按通过数排序
+    sortOrder: "ASC" // 降序
+  }, {
+    orderBy: "id", // 按通过数排序
+    sortOrder: ""
+  }],
+  tag: "", // 标签
+  offset: 0, // 偏移
+  limit: 10 // 分页大小
+})
+watch(() => filters, () => {
+  problemApi.problemList(filters).then(res => {
+    store.setProblemList(res)
+  })
+}, { deep: true })
+
+const handleFilters = (type: string, value: any) => {
+  value = value || ''
+  switch (type) {
+    case 'search':
+      filters.searcherKeyWords = value
+      break;
+    case 'difficulty':
+      if (value == "") filters.difficulty = 0
+      else filters.difficulty = difficultyArr.indexOf(value);
+      break;
+    case 'tag':
+      filters.tag = value;
+      break;
+    case 'courseName':
+      filters.courseName = value;
+      break;
+  }
+};
+
+// 课程类型选择
+const currentCategory = ref("全部")
+function changeCategory(category: string) {
+  if (category === "全部") {
+    filters.category = ""
+  } else {
+    filters.category = category
+  }
+}
+// 难度样式
+function difficultyColor(difficulty: number) {
+  switch (difficulty) {
+    case 1: return "easy"
+    case 2: return "medium"
+    case 3: return "hard"
+  }
+}
 
 // 表格列配置
+const role = 2 || userStore().userInfo.role
+
 const columns: ColumnsType = [{
   title: '编号',
   dataIndex: 'id',
@@ -35,13 +118,14 @@ const columns: ColumnsType = [{
 }, {
   title: '通过人数',
   dataIndex: 'Cnt',
-  width: "120px"
+  width: "120px",
+  sorter: true,
 }, {
   title: '难度',
   dataIndex: 'difficulty',
   width: "100px"
 }]
-if (role === 2) {
+if (role === 1) {
   columns.push({
     title: '状态',
     dataIndex: 'pass',
@@ -62,128 +146,35 @@ if (role === 2) {
   })
 }
 
-// 筛选参数
-// TODO: 修复筛选
-const filters = reactive({
-  "category": "", // 题目类型
-  "courseName": "", // 课程
-  "searcherKeyWords": "", // 题目 或 题目id
-  "orders": [{
-    "orderBy": "cnt", // 按通过数排序
-    "sortOrder": "DESC" // 降序
-  }],
-  "tag": "", // 标签
-  "offset": 0, // 偏移
-  "limit": 20 // 分页大小
-})
-watch(() => filters, () => {
-  store.list(filters).then(res => {
-    problemList.value = res
-  })
-}, { deep: true })
-
-// 搜索框
-function onSearch(value: string) {
-  filters.searcherKeyWords = value
-}
-
-// 排序
-const orders = ref([
-
-])
-
-// TODO: 修复difficulty筛选（后端）
-const difficultyFilter = ref('')
-watch(difficultyFilter, (val) => {
-  store.filter(val).then(res => {
-    problemList.value = res
-  })
-})
-function difficultyColor(difficulty: string) {
-  switch (difficulty) {
-    case "简单": return "easy"
-    case "中等": return "medium"
-    case "困难": return "hard"
-  }
-}
-
-// 分页控制
-// const pagination = {
-//   pageSize: 20, // 默认每页显示数量
-//   showQuickJumper: true,
-//   showSizeChanger: true, // 显示可改变每页数量
-//   pageSizeOptions: ["10", "20", "30", "40"], // 每页数量选项
-//   showSizeChange: (current: number, pageSize: number) => {
-//     console.log(current, pageSize)
-//   } // 改变每页数量时更新显示
-// }
-
-// 课程类型选择
-const categoryArr: string[] = ["全部", "代码", "选择", "填空", "大题"]
-const currentCategory = ref("全部")
-function changeCategory(category: string) {
-  console.log(category);
-  if (category === "全部") {
-    filters.category = ""
-  } else {
-    filters.category = category
-  }
-}
-
-// 标签选择
-const tags = reactive({
-  tag: [],
-  // TODO: 获取课程列表
-  courseName: ['软件工程', '数据结构', '程序设计', '计算机网络']
-})
-onBeforeMount(async () => {
-  const tag: any = await store.tags()
-  tags.tag = tag?.map((item: any) => item["tagName"])
-})
-
-const handleChange = (type: string, value: any) => {
-  console.log(`${type},selected ${value}`);
-  value = value || ''
-  switch (type) {
-    case 'difficulty':
-      difficultyFilter.value = value;
-      break;
-    case 'tag':
-      filters.tag = value;
-      break;
-    case 'courseName':
-      filters.courseName = value;
-      break;
-  }
-};
-
 // 收藏
-function handleFavour(row: any) {
-  console.log(row.id);
+async function handleFavour(row: any) {
   const id = row.id
-
   if (row.favour) {
-    store.cancelFavour(id).then(res => {
-      console.log(res);
-      message.success("取消收藏", 0.5)
-    })
+    const res = await problemApi.problemCancelFavour(id)
+    if (res.code == 0) {
+      message.success("取消收藏")
+      row.favour = false
+    }
   } else {
-    store.favour(id).then(res => {
-      console.log(res);
-      message.success("收藏成功", 0.5)
-    })
+    const res = await problemApi.problemFavour(id)
+    if (res.code == 0) {
+      message.success("收藏成功")
+      row.favour = true
+    }
   }
-  row.favour = !row.favour
 }
 
 // [老师] 操作
-function handleDelete(id: number) {
-  store.delete(id).then(async res => {
-    problemList.value = await store.list(filters)
+async function handleDelete(id: number) {
+  const res = await problemApi.problemDelete(id)
+  if (res.code === 0) {
+    const problemList = await problemApi.problemList(filters)
+    evaluteChartData(problemList)
+    store.setProblemList(problemList)
     message.success("删除成功")
-  }).catch(err => {
-    message.error("删除失败，" + err);
-  })
+  } else {
+    message.error("删除失败，" + res.message);
+  }
 }
 
 // 标签展示
@@ -202,106 +193,66 @@ function handleDelete(id: number) {
 //   //   }
 // };
 
-// ECharts图表
-const chartData = {
-  difficulty: [{
-    value: 0, name: '简单'
-  }, {
-    value: 0, name: '中等'
-  }, {
-    value: 0, name: '困难'
-  },],
-  category: [{
-    value: 0, name: '选择',
-  }, {
-    value: 0, name: '填空',
-  }, {
-    value: 0, name: '大题',
-  }, {
-    value: 0, name: '代码',
-  },
-  ]
+// 分页控制
+const pagination: TablePaginationConfig = {
+  pageSize: 10, // 默认每页显示数量
+  showSizeChanger: true, // 显示可改变每页数量
+  pageSizeOptions: ["10", "20", "30", "40"], // 每页数量选项
+  current: 1,
+  total: 20
 }
-const chartEle = ref(null)
-const option: EChartsOption = {
-  legend: {
-    left: "center",
-  },
-  series: [
-    {
-      name: 'ProblemSet Charts',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: {
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: '#fff',
-      },
-      label: {
-        show: false,
-        position: 'center'
-      },
-      labelLine: {
-        show: false
-      },
-      emphasis: {
-        label: {
-          show: true,
-          formatter: `{b}\n{c}`,
-          fontSize: '16px',
-          lineHeight: 30,
-          fontWeight: 'bold'
-        },
-      },
-      data: chartData.difficulty
-    }
-  ]
-};
-const cardActiveKey = ref('difficulty')
-let chartEch: ECharts
-const changeChart = (val: any) => {
-  console.log(val);
-  // @ts-ignore
-  option.series[0].data = chartData[val]
-  chartEch.setOption(option as unknown, true);
+
+// 表格分页、筛选、排序处理
+const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
+  // pagination
+  const { current, pageSize } = pag
+  if (filters.offset != current) {
+    pagination.current = current
+    filters.offset = (current - 1) * pageSize
+  }
+  if (filters.limit != pageSize) {
+    pagination.pageSize = pageSize
+    filters.limit = pageSize
+  }
+  // sorter
+  const order = (sorter as SorterResult<any>).order
+  switch (order) {
+    case 'ascend':
+      filters.orders[0] = {
+        orderBy: "cnt",
+        sortOrder: "ASC"
+      }
+      break;
+    case 'descend':
+      filters.orders[0] = {
+        orderBy: "cnt",
+        sortOrder: "DESC"
+      }
+      break;
+    default:
+      filters.orders[0] = {
+        orderBy: "id",
+        sortOrder: "ASC"
+      }
+  }
 }
-// 加载数据
-onBeforeMount(async () => {
-  problemList.value = await store.list() as any
-  message.success("请求成功", 2)
-  hotProblemList.value = getStorage('problem') || []
-  problemList.value.forEach((item: any) => {
-    const dindex = difficultyArr.indexOf(item.difficulty)
-    if (dindex === -1) return
-    chartData.difficulty[dindex].value++
-    const cindex = chartData.category.map((cate: any) => cate['name']).indexOf(item.category)
 
-    if (cindex === -1) return
-    chartData.category[cindex].value++
-  })
-  chartEch = init(chartEle.value);
-  chartEch.setOption(option as unknown, true);
-})
-
-// 热门题目
-const hotProblemList = ref([])
 </script>
 
 <template>
   <div class="problemset">
     <section>
-      <AInputSearch placeholder="搜索题目名称" allowClear style="width:20em" @search="onSearch" />
+      <AInputSearch placeholder="搜索题目名称" allowClear style="width:20em" @search="handleFilters('search', $event)" />
       <ASpace style="margin-left: 20px;">
-        <a-select allowClear placeholder="难度" @change="handleChange('difficulty', $event)" class="tagSelect">
-          <a-select-option v-for="difficulty in difficultyArr" :value="difficulty">{{ difficulty }}
+        <a-select allowClear placeholder="难度" @change="handleFilters('difficulty', $event)" class="tagSelect">
+          <a-select-option v-for="difficulty in difficultyArr.slice(1)" :value="difficulty">{{ difficulty }}
           </a-select-option>
         </a-select>
-        <a-select allowClear placeholder="标签" @change="handleChange('tag', $event)" class="tagSelect">
-          <a-select-option v-for="tag in tags.tag" :value="tag">{{ tag }}</a-select-option>
+        <a-select allowClear placeholder="标签" @change="handleFilters('tag', $event)" class="tagSelect">
+          <a-select-option v-for="tag in tags" :value="tag">{{ tag }}</a-select-option>
         </a-select>
-        <a-select allowClear placeholder="课程" @change="handleChange('courseName', $event)" class="tagSelect">
-          <a-select-option v-for="courseName in tags.courseName" :value="courseName">{{ courseName }}
+        <a-select allowClear placeholder="课程" @change="handleFilters('courseName', $event)" class="tagSelect">
+          <a-select-option v-for="courseName in courses" :value="courseName">{{ courseName }}
           </a-select-option>
         </a-select>
       </ASpace>
@@ -322,11 +273,11 @@ const hotProblemList = ref([])
             <Random color="#fff" />
           </span>随机一题
         </span>
-        <a-table :columns="columns" :data-source="problemList">
+        <a-table :columns="columns" :data-source="problemList" :pagination="pagination" @change="handleTableChange">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'difficulty'">
               <div :class="difficultyColor(record.difficulty)">
-                {{ record.difficulty }}
+                {{ difficultyArr[record.difficulty] }}
               </div>
             </template>
             <template v-else-if="column.dataIndex === 'pass'">
@@ -372,7 +323,7 @@ const hotProblemList = ref([])
           <p>
             <FireOutlined class="icon" style="color: #BD3124 ;" /> 热门题目
           </p>
-          <a-list :data-source="hotProblemList" class="hotProblemList">
+          <a-list :data-source="hotList" class="hotProblemList">
             <template #renderItem="{ item, index }">
               <a-list-item>
                 {{ index + 1 }}. {{ item.title }}
@@ -416,8 +367,7 @@ const hotProblemList = ref([])
 
 .card-container {
   margin-top: 40px;
-  display: inline-flex;
-  height: 500px;
+  display: flex;
   flex-direction: column;
 }
 
@@ -427,6 +377,10 @@ const hotProblemList = ref([])
   padding: 20px;
   border-radius: 16px;
   margin-bottom: 14px;
+}
+
+.hot {
+  padding-bottom: 10px;
 }
 
 .top {

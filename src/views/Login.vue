@@ -2,8 +2,8 @@
 import type { UnwrapRef } from 'vue';
 import { FormProps, message } from 'ant-design-vue';
 import { LoginForm } from '@/types/request';
-import { userStore } from "@/store/user";
-import { remove } from 'nprogress';
+import { userStore } from "@/store";
+import userApi from '@/api/user';
 
 const store = userStore()
 const router = useRouter();
@@ -15,24 +15,26 @@ const loginForm: UnwrapRef<LoginForm> = reactive({
   account: store.userInfo.email || store.userInfo.schoolId || getStorage("account"),
   password: store.userInfo.password || (remember.value ? getStorage("password") : ""),
 })
+console.log(store.userInfo.email, store.userInfo.password);
 
-const handleFinish: FormProps['onFinish'] = () => {
+
+const handleFinish: FormProps['onFinish'] = async () => {
   // 记住密码处理
   setStorage("account", loginForm.account);
   setStorage("remember", remember.value);
   if (remember.value) {
-    // TODO: 加密密码
     setStorage('password', loginForm.password);
   } else {
     removeStorage('password')
   }
   // 提交数据
-  store.login(loginForm).then(res => {
-    message.loading("登陆成功，跳转中...", 1.5).then(() => {
-      router.push("/home");
-    });
-  })
+  const res = await userApi.login(loginForm)
   console.log(loginForm);
+  if ("token" in res) {
+    setCookie('token', res.token)
+    await message.loading("登陆成功，跳转中...", 0.5)
+    router.push("/home");
+  }
 };
 const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
   console.log(errors);
@@ -124,19 +126,5 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
     }
   }
 
-}
-
-.agreement {
-  text-align: center;
-  font-size: 13px;
-  color: #A8A8B3;
-  position: absolute;
-  bottom: 24px;
-  white-space: nowrap;
-
-  a {
-    display: inline-block;
-    padding: 0 5px;
-  }
 }
 </style>

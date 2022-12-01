@@ -1,7 +1,11 @@
+import { MessageResponse } from "@/types/request"
 import { Problem } from "@/types/store"
 import service from "./service"
 
-function problemList(data: any): Promise<Problem.problem[]> {
+function problemList(data: Problem.filters = {
+  offset: 0,
+  limit: 10
+}): Promise<Problem.problem[]> {
   return service({
     method: "POST",
     url: "/v1/problem/allWithTag",
@@ -9,7 +13,7 @@ function problemList(data: any): Promise<Problem.problem[]> {
   })
 }
 
-function problemTags() {
+function problemTags(): Promise<Problem.Tag[]> {
   return service({
     method: "GET",
     url: "/v1/problem/tag",
@@ -24,7 +28,7 @@ function problemCreate(data: any) {
   })
 }
 
-function problemFavour(problemId: number) {
+function problemFavour(problemId: number): Promise<MessageResponse> {
   return service({
     method: "GET",
     url: "/v1/problem/collection",
@@ -34,7 +38,7 @@ function problemFavour(problemId: number) {
   })
 }
 
-function problemCancelFavour(problemId: number) {
+function problemCancelFavour(problemId: number): Promise<MessageResponse> {
   return service({
     method: "DELETE",
     url: "/v1/problem/collection",
@@ -44,7 +48,7 @@ function problemCancelFavour(problemId: number) {
   })
 }
 
-function problemDelete(problemId: number) {
+function problemDelete(problemId: number): Promise<MessageResponse> {
   return service({
     method: "DELETE",
     url: `/v1/problem/${problemId}`,
@@ -53,14 +57,22 @@ function problemDelete(problemId: number) {
 /**
  * 获取具体题目详情
  */
-function problemDetail(title: string) {
+function problemDetail(problemId: number): Promise<Problem.problem> {
   return service({
     method: "GET",
-    url: `/v1/problem/${title}`,
+    url: `/v1/problem/${problemId}`,
   })
 }
 
-export default {
+function problemModify(problemId: number, data: any): Promise<Problem.problem> {
+  return service({
+    method: "PUT",
+    url: `/v1/problem/${problemId}`,
+    data,
+  })
+}
+
+const problemApi = {
   problemList,
   problemCreate,
   problemTags,
@@ -68,4 +80,8 @@ export default {
   problemCancelFavour,
   problemDelete,
   problemDetail,
+  problemModify,
 }
+
+
+export default problemApi

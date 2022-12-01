@@ -12,7 +12,7 @@ const _isMobile = useSharedIsMobile(setSidebarCollapsed)
 const sidebarRelated = reactive<Layout.SidebarRelated>({
   collapsed: false,
   shadowCollapsed: false,
-  width: '13rem',
+  width: '15rem',
   collapsedWidth: '3rem',
 })
 const loading = reactive<Layout.Loading>({
@@ -39,13 +39,13 @@ provide('loading', loading)
   <ALayout>
     <ALayoutSider v-if="!_isMobile" v-model:collapsed="sidebarRelated.collapsed" collapsible :trigger="null"
       :width="sidebarRelated.width" :collapsedWidth="sidebarRelated.collapsedWidth" breakpoint="md">
-      <div style="position: relative; z-index: 999; display: flex; flex-direction: column; width: 100%; height: 100%;">
+      <div style="relative; z-index: 999; display: flex; flex-direction: column; width: 100%; height: 100%;">
         <RouterLink to="/">
           <div v-if="(sidebarRelated.shadowCollapsed || sidebarRelated.collapsed)" class="flex-center logo-collapsed">
             <img :src="Logo" alt="Logo" class="logo">
           </div>
-          <div v-else style="display: flex;align-items: center;margin-top: 14px;">
-            <img :src="Logo" alt="Logo" class="logo" style="margin-left: 24px;">
+          <div v-else class="flex-center" style="display: flex;align-items: center;margin-top: 14px;">
+            <img :src="Logo" alt="Logo" class="logo">
             <span style="line-height: 32px;font-size:24px;color:black;margin-left: 14px">荔课网练</span>
           </div>
         </RouterLink>
@@ -114,7 +114,6 @@ provide('loading', loading)
   left: 0;
   top: 0;
   z-index: 1;
-  width: 13rem;
   height: 100%;
   background-color: var(--sidebar-background-color);
   transition: transform ease 0.2s;

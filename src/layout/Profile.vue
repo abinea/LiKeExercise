@@ -3,23 +3,28 @@
     <img :src="avatar" alt="用户头像" class="avatar">
     <p>{{ username }}</p>
   </div>
-  <ADivider />
+  <span style="padding:0 38px 0 42px">
+    <ADivider />
+  </span>
+
 </template>
 
 <script setup lang="ts">
+import { userStore } from '@/store';
+
+const store = userStore()
 const avatar = ref('./src/assets/default.png')
-const username = ref('老师')
+const { username } = store.userInfo
 </script>
 
 <style scoped>
 .profile {
-  width: 208px;
   height: 200px;
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 50px;
   margin-left: -6px;
 }
 

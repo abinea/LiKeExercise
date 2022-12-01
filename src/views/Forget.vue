@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { FormProps } from 'ant-design-vue';
-import { userStore } from "@/store/user";
 import { message } from "ant-design-vue"
+import userApi from '@/api/user';
 
-const store = userStore()
 const router = useRouter();
 
-// 记住密码
 // 登录表单
 const resetForm = reactive({
   email: "",
@@ -14,23 +12,23 @@ const resetForm = reactive({
   password: ""
 })
 
+// 进度条
+const steps = [{
+  title: '验证邮箱',
+}, {
+  title: '重置密码',
+}, {
+  title: '完成',
+}]
+const current = ref(0)
+const isNext = ref(false)
+
 const count = ref(0)
-
-const handleFinish: FormProps['onFinish'] = () => {
-  // 提交数据
-  store.resetValid(resetForm)
-  // .then(res=>{
-  //   message.success("验证成功",2)
-  // })
-  console.log(resetForm);
-};
-const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-  console.log(errors);
-};
-
 let timer: any = null;
-const handleGetCaptcha = () => {
-  store.resetCaptcha({ email: resetForm.email }).then(res => {
+async function handleGetCaptcha() {
+  const res = await userApi.resetCaptcha({ email: resetForm.email })
+  if (res.code === 0) {
+    message.success("验证码已发送")
     count.value = 60
     clearInterval(timer)
     timer = setInterval(() => {
@@ -40,46 +38,41 @@ const handleGetCaptcha = () => {
         count.value--
       }
     }, 1000)
-  })
+  }
+}
+const resetValid: FormProps['onFinish'] = async () => {
+  // 提交数据
+  const res = await userApi.resetValid(resetForm)
+  if (res.code === 0) {
+    isNext.value = true
+    current.value++
+    message.success("验证成功", 1.5)
+  }
+  else {
+    return
+  }
+};
+async function reset() {
+  const res = await userApi.resetPassword({ email: resetForm.email, newPasswd: resetForm.password })
+  console.log(res);
+  current.value++
+  await message.loading("重置成功，跳转中...", 0.5)
+  router.push("/login");
 }
 
-// 进度条
-const steps = [
-  {
-    title: '验证邮箱',
-  },
-  {
-    title: '重置密码',
-  },
-  {
-    title: '完成',
-  },
-]
-const current = ref(0)
-const isNext = ref(false)
-const nextStep = () => {
-  isNext.value = true
-  current.value++
-  message.success("验证成功", 1.5)
+const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
+  console.log(errors);
 };
-function reset() {
-  store.resetPassword({ email: resetForm.email, newPasswd: resetForm.password }).then(res => {
-    current.value++
-    message.loading("重置成功，跳转中...", 1.5).then(() => {
-      router.push("/login");
-    });
-  })
-}
 </script>
 
 <template>
-  <div class="register-page page">
-    <div class="register-container">
-      <a class="register-back" href="#/login">
+  <div class="forget-page page">
+    <div class="forget-container">
+      <a class="forget-back" href="#/login">
         <LeftOutlined /> 返回登录
       </a>
-      <div class="register-header">重置密码</div>
-      <AForm class="register-form" :model="resetForm" @finish="handleFinish" @finishFailed="handleFinishFailed">
+      <div class="forget-header">重置密码</div>
+      <AForm class="forget-form" :model="resetForm" @finishFailed="handleFinishFailed">
         <AFormItem style="padding-bottom: 20px;">
           <a-steps :current="current" size="small">
             <a-step v-for="item, index in steps" :key="index" :title="item.title" />
@@ -115,11 +108,11 @@ function reset() {
           </AInputPassword>
         </AFormItem>
         <AFormItem name="submit">
-          <AButton v-if="!isNext" class="register-form-button" size="large" type="primary" html-type="submit"
-            @click="nextStep" :disabled="resetForm.email === '' || resetForm.captcha === ''">
+          <AButton v-if="!isNext" class="forget-form-button" size="large" type="primary" html-type="submit"
+            @click="resetValid" :disabled="resetForm.email === '' || resetForm.captcha === ''">
             下一步
           </AButton>
-          <AButton v-else class="register-form-button" size="large" type="primary" html-type="submit" @click="reset"
+          <AButton v-else class="forget-form-button" size="large" type="primary" html-type="submit" @click="reset"
             :disabled="resetForm.email === '' || resetForm.password === ''">
             重置
           </AButton>
@@ -131,7 +124,7 @@ function reset() {
 
 
 <style scoped lang="less">
-.register {
+.forget {
   &-back {
     position: absolute;
     top: 46px;

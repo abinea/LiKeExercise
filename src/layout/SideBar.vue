@@ -109,6 +109,7 @@ function getOnlyChildPath(parentRoute: RouteRecordRaw): RouteRecordRaw {
     <AMenu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" :selectable="false">
       <template v-for="route in sidebar.getSidebar()" key="index">
         <MenuItemNav :route="route" :basePath="route.path"
+          style="font-size: 16px;margin-bottom: 20px;padding-left: 10px;"
           :style="{ justifyContent: sidebarRelated?.collapsed ? 'flex-start' : 'center' }"></MenuItemNav>
       </template>
     </AMenu>

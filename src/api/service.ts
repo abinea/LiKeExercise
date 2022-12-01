@@ -17,6 +17,7 @@ service.interceptors.request.use(
   },
   (error) => {
     console.error("request", error)
+    message.error('请求失败')
     return Promise.reject(error)
   }
 )

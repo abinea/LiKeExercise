@@ -21,6 +21,11 @@ export namespace Problem {
     tagName: string
   }
 
+  type Order = {
+    orderBy: string
+    sortOrder: "DESC" | "ASC" | ""
+  }
+
   interface problem {
     // TODO: 具体命名id
     id: UUID // 题目id
@@ -28,13 +33,24 @@ export namespace Problem {
     question: string // 题目内容
     courseName: string // 课程
     category: "选择" | "填空" | "大题" | "代码" | "" // 题目类型
-    difficulty: "简单" | "中等" | "困难" // 难度
+    difficulty: 0 | 1 | 2 | 3 // 难度，0-用于筛选全部，1-简单，2-中等，3-困难
     tags: Tag[] | [] // 题目标签
     Cnt: number // 通过人数
     favour: boolean // 是否收藏
     pass: boolean // 是否做过
     schoolId: number // 出题人id
     deletedAt?: Date
+  }
+
+  interface filters {
+    category?: string // 题目类型
+    courseName?: string // 课程
+    searcherKeyWords?: string | number // 题目 或 题目id
+    orders?: Order[] | []
+    tag?: string // 标签
+    difficulty?: number
+    offset: number // 偏移，首页为0
+    limit: number // 分页大小
   }
 }
 
