@@ -127,10 +127,10 @@ const rules: Record<string, Rule[]> = {
         </AFormItem>
         <AFormItem name="role">
           <span class="big left">选择身份：</span>
-          <a-radio-group class="radio-group" v-model:value="registerForm.role">
-            <a-radio :value="1" class="big">学生</a-radio>
-            <a-radio :value="2" class="big">老师</a-radio>
-          </a-radio-group>
+          <ARadioGroup class="radio-group" v-model:value="registerForm.role">
+            <ARadio :value="1" class="big">学生</ARadio>
+            <ARadio :value="2" class="big">老师</ARadio>
+          </ARadioGroup>
         </AFormItem>
         <AFormItem name="submit">
           <AButton class="register-form-button" size="large" type="primary" html-type="submit" :disabled="

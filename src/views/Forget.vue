@@ -74,9 +74,9 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
       <div class="forget-header">重置密码</div>
       <AForm class="forget-form" :model="resetForm" @finishFailed="handleFinishFailed">
         <AFormItem style="padding-bottom: 20px;">
-          <a-steps :current="current" size="small">
-            <a-step v-for="item, index in steps" :key="index" :title="item.title" />
-          </a-steps>
+          <ASteps :current="current" size="small">
+            <AStep v-for="item, index in steps" :key="index" :title="item.title" />
+          </ASteps>
         </AFormItem>
         <AFormItem name="email">
           <AInput size="large" v-model:value="resetForm.email" placeholder="邮箱">
@@ -91,13 +91,13 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
               <LockOutlined />
             </template>
             <template #suffix>
-              <a-button style="border-radius: 8px;" type="default" @click="handleGetCaptcha">
+              <AButton style="border-radius: 8px;" type="default" @click="handleGetCaptcha">
                 {{
-                    count === 0 ?
+                    count.value === 0 ?
                       "获取验证码" :
                       `${count}秒后重试`
                 }}
-              </a-button>
+              </AButton>
             </template>
           </AInput>
           <AInputPassword v-else size="large" v-model:value="resetForm.password" type="password" placeholder="密码"

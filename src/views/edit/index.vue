@@ -97,11 +97,11 @@ async function handleEdit() {
 <template>
   <div class="edit">
     <section>
-      <a-select style="width: 120px;" size="large" v-model:value="problem.category" class="tagSelect">
-        <a-select-option v-for="item in categoryArr.slice(1)" :value="item"> </a-select-option>
-      </a-select>
+      <ASelect style="width: 120px;" size="large" v-model:value="problem.category" class="tagSelect">
+        <ASelectOption v-for="item in categoryArr.slice(1)" :value="item"> </ASelectOption>
+      </ASelect>
     </section>
-    <a-divider />
+    <ADivider />
     <main style="width: 80%" class="edit-problem">
       <div style="box-sizing:border-box;width: 70%">
         <AInput size="large" placeholder="请输入题目标题" v-model:value="problem.title" />
@@ -132,23 +132,23 @@ async function handleEdit() {
       </div>
       <div class="property">
         <p class="property-title">属性（必填）</p>
-        <a-form name="Property">
-          <a-form-item name="难度" label="难度">
-            <a-select placeholder="请选择难度" v-model:value="problem.difficulty">
-              <a-select-option v-for="item, index in difficultyArr.slice(1)" :value="index + 1">{{ item }}
-              </a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item name="课程" label="课程">
-            <a-auto-complete v-model:value="problem.courseName" :options="options" allowClear defaultOpen
+        <AForm name="Property">
+          <AFormItem name="难度" label="难度">
+            <ASelect placeholder="请选择难度" v-model:value="problem.difficulty">
+              <ASelectOption v-for="item, index in difficultyArr.slice(1)" :value="index + 1">{{ item }}
+              </ASelectOption>
+            </ASelect>
+          </AFormItem>
+          <AFormItem name="课程" label="课程">
+            <AAutoComplete v-model:value="problem.courseName" :options="options" allowClear defaultOpen
               placeholder="请输入课程" @select="onSelect" @search="onSearch" @change="onChange" />
-          </a-form-item>
-          <a-form-item name="标签" label="标签">
-            <a-select mode="tags" placeholder="请输入标签" v-model:value="showTags" @change="selectTags">
-              <a-select-option v-for="tag in tags" :value="tag">{{ tag }}</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-form>
+          </AFormItem>
+          <AFormItem name="标签" label="标签">
+            <ASelect mode="tags" placeholder="请输入标签" v-model:value="showTags" @change="selectTags">
+              <ASelectOption v-for="tag in tags" :value="tag">{{ tag }}</ASelectOption>
+            </ASelect>
+          </AFormItem>
+        </AForm>
       </div>
     </main>
     <div>

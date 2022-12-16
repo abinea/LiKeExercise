@@ -72,9 +72,9 @@ const inviteCode = ref('')
 
 <template>
   <div class="home">
-    <AModal v-model:visible="modalVisible" :title="role === 1 ? '添加班级' : '新建班级'" ok-text="确认" cancel-text="取消"
+    <AModal v-model:visible="modalVisible" :title="role.value === 1 ? '添加班级' : '新建班级'" ok-text="确认" cancel-text="取消"
       @ok="hideModal">
-      <AForm v-if="(role === 1)">
+      <AForm v-if="(role.value === 1)">
         <AFormItem label="邀请码">
           <AInput v-model:value="inviteCode" />
         </AFormItem>
@@ -104,28 +104,28 @@ const inviteCode = ref('')
     </AAutoComplete>
     <div style="margin-top:40px;">
       <AButton type="primary" @click="showModal">
-        {{ role == 1 ? "添加班级" : '新建班级' }}
+        {{ role.value == 1 ? "添加班级" : '新建班级' }}
       </AButton>
     </div>
 
     <div style="margin-top: 30px;">
-      <a-tabs v-model:activeKey="activeKey">
-        <a-tab-pane key="1" tab="进行中">
+      <ATabs v-model:activeKey="activeKey">
+        <ATabPane key="1" tab="进行中">
           <div class="class-container">
             <ClassItem v-for="item in classList" :classInfo="item" />
           </div>
-        </a-tab-pane>
-        <a-tab-pane key="2" tab="已结束">
+        </ATabPane>
+        <ATabPane key="2" tab="已结束">
           <div class="class-container">
             <ClassItem v-for="item in endedClass" :classInfo="item" />
           </div>
-        </a-tab-pane>
-        <a-tab-pane key="3" tab="所有班级">
+        </ATabPane>
+        <ATabPane key="3" tab="所有班级">
           <div class="class-container">
             <ClassItem v-for="item in allClass" :classInfo="item" />
           </div>
-        </a-tab-pane>
-      </a-tabs>
+        </ATabPane>
+      </ATabs>
     </div>
   </div>
 </template>

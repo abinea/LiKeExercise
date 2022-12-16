@@ -257,37 +257,37 @@ const randomProblem = () => {
     <section>
       <AInputSearch placeholder="搜索题目名称" allowClear style="width:20em" @search="handleFilters('search', $event)" />
       <ASpace style="margin-left: 20px;">
-        <a-select allowClear placeholder="难度" @change="handleFilters('difficulty', $event)" class="tagSelect">
-          <a-select-option v-for="difficulty in difficultyArr.slice(1)" :value="difficulty">{{ difficulty }}
-          </a-select-option>
-        </a-select>
-        <a-select allowClear placeholder="标签" @change="handleFilters('tag', $event)" class="tagSelect">
-          <a-select-option v-for="tag in tags" :value="tag">{{ tag }}</a-select-option>
-        </a-select>
-        <a-select allowClear placeholder="课程" @change="handleFilters('courseName', $event)" class="tagSelect">
-          <a-select-option v-for="courseName in courses" :value="courseName">{{ courseName }}
-          </a-select-option>
-        </a-select>
+        <ASelect placeholder="难度" @change="handleFilters('difficulty', $event)" class="tagSelect">
+          <ASelectOption v-for="difficulty in difficultyArr.slice(1)" :value="difficulty">{{ difficulty }}
+          </ASelectOption>
+        </ASelect>
+        <ASelect allowClear placeholder="标签" @change="handleFilters('tag', $event)" class="tagSelect">
+          <ASelectOption v-for="tag in tags" :value="tag">{{ tag }}</ASelectOption>
+        </ASelect>
+        <ASelect allowClear placeholder="课程" @change="handleFilters('courseName', $event)" class="tagSelect">
+          <ASelectOption v-for="courseName in courses" :value="courseName">{{ courseName }}
+          </ASelectOption>
+        </ASelect>
       </ASpace>
       <!-- <span v-for="condition in filters">
-        <a-tag closable @close="closeTag(condition)" v-if="condition" class="tags">
+        <ATag closable @close="closeTag(condition)" v-if="condition" class="tags">
           {{ condition }}
-        </a-tag>
+        </ATag>
       </span> -->
     </section>
     <div style="display: flex;">
       <div style="margin-top: 20px;  flex:1 0 auto;margin-right: 30px;">
-        <a-tabs v-model:activeKey="currentCategory" @change="changeCategory" style="display:inline-block;">
-          <a-tab-pane v-for="category in categoryArr" :key="category" :tab="category">
-          </a-tab-pane>
-        </a-tabs>
+        <ATabs v-model:activeKey="currentCategory" @change="changeCategory" style="display:inline-block;">
+          <ATabPane v-for="category in categoryArr" :key="category" :tab="category">
+          </ATabPane>
+        </ATabs>
         <span class="right" style="display:flex;align-items: center;margin-top:5px; margin-right:60px;color:#7B88FF;"
           @click="randomProblem">
           <span class="random shadow">
             <RandomIcon color="#fff" />
           </span>随机一题
         </span>
-        <a-table :columns="columns" :data-source="problemList" :pagination="pagination" @change="handleTableChange">
+        <ATable :columns="columns" :data-source="problemList" :pagination="pagination" @change="handleTableChange">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'title'">
               <RouterLink :to="{ path: `/problem/${record.id}` }" class="link">
@@ -311,12 +311,12 @@ const randomProblem = () => {
             <template v-else-if="column.dataIndex === 'actions'">
               <RouterLink :to="{ name: 'EditProblem', query: { id: record.id, title: record.title } }">修改</RouterLink>
               <ADivider type="vertical" />
-              <a-popconfirm v-if="problemList.length" title="确定删除？" @confirm="handleDelete(record.id)">
+              <APopconfirm v-if="problemList.value.length" title="确定删除？" @confirm="handleDelete(record.id)">
                 <a>删除</a>
-              </a-popconfirm>
+              </APopconfirm>
             </template>
           </template>
-        </a-table>
+        </ATable>
       </div>
       <div class="card-container">
         <div class=" top card shadow" v-if="role===2">
@@ -328,27 +328,27 @@ const randomProblem = () => {
         </div>
         <div class="statistics card shadow">
           <p>题型</p>
-          <a-tabs v-model:activeKey="cardActiveKey" @change="changeChart" class="problemTabs">
-            <a-tab-pane key="difficulty" tab="难度">
-            </a-tab-pane>
-            <a-tab-pane key="category" tab="类型">
-            </a-tab-pane>
-            <!-- <a-tab-pane key="3" tab="已完成">
-            </a-tab-pane> -->
-          </a-tabs>
+          <ATabs v-model:activeKey="cardActiveKey" @change="changeChart" class="problemTabs">
+            <ATabPane key="difficulty" tab="难度">
+            </ATabPane>
+            <ATabPane key="category" tab="类型">
+            </ATabPane>
+            <!-- <ATabPane key="3" tab="已完成">
+            </ATabPane> -->
+          </ATabs>
           <div ref="chartEle" style="width: 100%; height: 160px;"></div>
         </div>
         <div class="hot card shadow">
           <p>
             <FireOutlined class="icon" style="color: #BD3124 ;" /> 热门题目
           </p>
-          <a-list :data-source="hotList" class="hotProblemList">
+          <AList :data-source="hotList" class="hotProblemList">
             <template #renderItem="{ item }">
-              <a-list-item>
+              <AListItem>
                 {{ item.id }}. {{ item.title }}
-              </a-list-item>
+              </AListItem>
             </template>
-          </a-list>
+          </AList>
         </div>
       </div>
     </div>
