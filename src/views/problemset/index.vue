@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Random from '@/components/Random.vue';
+import Random from '@/components/RandomIcon.vue';
 import { message } from "ant-design-vue"
 import type { TableProps } from 'ant-design-vue/lib/table';
 import type { ColumnsType, TablePaginationConfig, SorterResult } from 'ant-design-vue/lib/table/interface';
@@ -284,7 +284,7 @@ const randomProblem = () => {
         <span class="right" style="display:flex;align-items: center;margin-top:5px; margin-right:60px;color:#7B88FF;"
           @click="randomProblem">
           <span class="random shadow">
-            <Random color="#fff" />
+            <RandomIcon color="#fff" />
           </span>随机一题
         </span>
         <a-table :columns="columns" :data-source="problemList" :pagination="pagination" @change="handleTableChange">

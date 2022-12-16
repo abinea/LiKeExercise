@@ -148,7 +148,9 @@ const rules: Record<string, Rule[]> = {
       </p>
     </div>
   </div>
-  <Footer />
+  <div class="footer">
+    <p>荔课网练 2022</p>
+  </div>
 </template>
 
 <style scoped lang="less">

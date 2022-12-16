@@ -34,7 +34,6 @@ onBeforeMount(async () => {
     problem.ans = res.ans
     showTags.value = res.tags.map((tag) => tag['tagName'])
   }
-
 })
 
 const options = ref([])

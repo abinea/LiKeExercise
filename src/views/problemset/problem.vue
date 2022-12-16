@@ -1,27 +1,24 @@
-<script setup lang="ts">
+<script lang="ts" setup >
 import HeadBar from '@/layout/HeadBar.vue';
 import MonacoEditor from '@/components/MonacoEditor.vue';
 import problemApi from '@/api/problem';
 import solutionApi from '@/api/solution';
-import {  Solution } from '@/types/store';
-import { message, Modal } from "ant-design-vue"
+import { Solution } from '@/types/store';
+import { message } from "ant-design-vue"
 import { problemStore, userStore } from '@/store';
-import formatDate from "@/utils/formatDate"
-
+import { formatDate } from "@/utils/formatUtils"
 
 const route = useRoute()
 const id = Number(route.params.id)
 
 const store = problemStore()
-const uid=computed(()=> userStore().userInfo.schoolId)
-const role=computed(()=> userStore().userInfo.role)
+const uid = computed(() => userStore().userInfo.schoolId)
 const difficultyArr = store.difficultyArr
 
 const editorProps = reactive({
   width: "60vw",
   height: '70vh',
   theme: 'light',
-  defaultValue: '',
   language: "javascript"
 })
 
@@ -78,31 +75,31 @@ const problem = reactive({
 })
 
 onBeforeMount(async () => {
-  const res= await problemApi.problemDetail(problem.id)
-  console.log('题目',res);
-    problem.title = res.title
-    problem.question = res.question 
-    problem.category = res.category
-    problem.courseName = res.courseName
-    problem.difficulty = res.difficulty
-    problem.tags = res.tags
-    problem.ans = res.ans
-    problem.Cnt = res.Cnt
-    problem.favour = res.favour
+  const res = await problemApi.problemDetail(problem.id)
+  console.log('题目', res);
+  problem.title = res.title
+  problem.question = res.question
+  problem.category = res.category
+  problem.courseName = res.courseName
+  problem.difficulty = res.difficulty
+  problem.tags = res.tags
+  problem.ans = res.ans
+  problem.Cnt = res.Cnt
+  problem.favour = res.favour
 })
 
 // 收藏
 async function handleFavour() {
   if (problem.favour) {
     const res = await problemApi.problemCancelFavour(id)
-    console.log('取消收藏',res);
+    console.log('取消收藏', res);
     if (res.code == 0) {
       message.success("取消收藏")
       problem.favour = false
     }
   } else {
     const res = await problemApi.problemFavour(id)
-    console.log('添加收藏',res);
+    console.log('添加收藏', res);
     if (res.code == 0) {
       message.success("收藏成功")
       problem.favour = true
@@ -131,16 +128,16 @@ const handleSolution = async () => {
     message.error("标题或内容不能为空")
     return
   } else {
-    if(!isEditing.value){
+    if (!isEditing.value) {
       console.log('create');
       await solutionApi.solutionCreate(id, solution.value)
-    }else{
+    } else {
       console.log("update");
-      await solutionApi.solutionUpdate(id,currentId.value,{...solution.value,schoolId:uid.value})
+      await solutionApi.solutionUpdate(id, currentId.value, { ...solution.value, schoolId: uid.value })
     }
     const res = await solutionApi.solutionAll(id)
-    if(solutionCount.value==0){
-      currentId.value=res.solutions[0]?.id||0
+    if (solutionCount.value == 0) {
+      currentId.value = res.solutions[0]?.id || 0
     }
     solutionList.value = res.solutions
     solutionCount.value = res.solutionsNumber;
@@ -219,38 +216,39 @@ const submitSelect = async () => {
 const ansVisible = ref(false)
 const handleAnsVisible = () => ansVisible.value = false
 
-const isRightShow=computed(()=>{
-  if(problem.category==='选择'||problem.category==='填空'){
-    if(isSolution.value){
-      if(isCreateSolution.value) return true
-      else{
-        if(solutionList.value.length==0) return false
+const isRightShow = computed(() => {
+  if (problem.category === '选择' || problem.category === '填空') {
+    if (isSolution.value) {
+      if (isCreateSolution.value) return true
+      else {
+        if (solutionList.value.length == 0) return false
         else return true
       }
-    }else{
+    } else {
       return false
     }
-  }else{
+  } else {
     return true
   }
 })
 
-const isEditing=ref(false)
-const handleEdit=()=>{
-  solution.value.title=currentSolution.value.title
-  solution.value.content=currentSolution.value.content
-  isCreateSolution.value=true
-  isEditing.value=true
+const isEditing = ref(false)
+const handleEdit = () => {
+  solution.value.title = currentSolution.value.title
+  solution.value.content = currentSolution.value.content
+  isCreateSolution.value = true
+  isEditing.value = true
 }
 
-const handleDelete=async()=>{
-  await solutionApi.solutionDetele(id,currentId.value)
+const handleDelete = async () => {
+  await solutionApi.solutionDetele(id, currentId.value)
   const res = await solutionApi.solutionAll(id)
   solutionList.value = res.solutions
   solutionCount.value = res.solutionsNumber;
-  changeCurrentId(res.solutions[0]?.id||0)
+  changeCurrentId(res.solutions[0]?.id || 0)
   message.success("删除成功")
 }
+
 </script>    
 <template >
   <HeadBar :isSingle="true" style="background-color: #f2f4f7;"></HeadBar>
@@ -290,7 +288,9 @@ const handleDelete=async()=>{
             <template #renderItem="{ item }">
               <AListItem class="solution content" @click="changeCurrentId(item.id)" style="cursor: pointer;">
                 <h3 style="font-size:16px;font-weight:500;">{{ item.title }}</h3>
-                <div class="solution-preview">{{ item.content.replaceAll(/<\/?.+?>/g, ' ') }}</div>
+                <div class="solution-preview">{{ item.content.slice(0, 300).replace(new RegExp(`<\ /?.+?>`, 'g'), ' ')
+                }}
+                </div>
               </AListItem>
             </template>
           </AList>
@@ -300,24 +300,7 @@ const handleDelete=async()=>{
         <section class="widget description">
           <div>
             <div class="title">题目描述</div>
-            <RichTextEditor class="content" v-model="problem.question" :readonly="true" :scroll="false"/>
-            <!-- <p>给定一个整数数组
-                <code>nums</code> 和一个目标值 <code>target</code>，请你在该数组中找出和为目标值的那
-                <strong>两个</strong> 整数，并返回他们的数组下标。
-              </p>
-              <p>你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案中不能重复出现。</p>
-              <p>你可以按照任意顺序返回答案。</p>
-              <h4>样例 1</h4>
-              <div>
-                <p><strong>输入：</strong> <code>nums=[2,7,11,15],target=9</code></p>
-                <p><strong>输出：</strong> <code>[0,1]</code></p>
-                <p><strong>解释：</strong> 因为 <code>nums[0]+nums[1]==9</code>，返回 <code>[0,1]</code>。</p>
-              </div>
-              <h4>样例 2</h4>
-              <div>
-                <p><strong>输入：</strong> <code>nums=[3,2,4],target=6</code></p>
-                <p><strong>输出：</strong> <code>[1,2]</code></p>
-              </div> -->
+            <RichTextEditor class="content" v-model="problem.question" :readonly="true" :scroll="false" />
           </div>
           <div v-if="problem?.category === '选择'">
             <div class="title">题目选项</div>
@@ -360,39 +343,41 @@ const handleDelete=async()=>{
           <AButton type="primary" danger @click="handleSolution()" class="right">
             发布题解</AButton>
           <AInput size="large" v-model:value="solution.title" placeholder="请输入题解标题" style="margin-top: 30px;" />
-          <RichTextEditor style="margin-top: 24px;" placeholder="请输入题解内容"
-            v-model="solution.content" />
+          <RichTextEditor style="margin-top: 24px;" placeholder="请输入题解内容" v-model="solution.content" />
         </div>
       </section>
       <section v-else class="widget">
         <div class="code">
           <div v-if="isSolution" class="answer">
             <h2>{{ currentSolution?.title }}</h2>
-            <ASpace class="subtitlte" >
+            <ASpace class="subtitlte">
               {{ currentCommentUser[0]?.username }}
-              <ATag v-if="currentCommentUser[0]?.role==1" color="green" style="font-weight:700;border-radius:10px"> 学生 </ATag>
-                        <ATag v-else color="blue" style="font-weight:700;border-radius:10px"> 老师 </ATag>
+              <ATag v-if="currentCommentUser[0]?.role == 1" color="green" style="font-weight:700;border-radius:10px"> 学生
+              </ATag>
+              <ATag v-else color="blue" style="font-weight:700;border-radius:10px"> 老师 </ATag>
               &nbsp;发布于 {{
-                  formatDate(currentSolution?.createAt)
+                  formatDate(currentSolution?.createdAt)
               }}
             </ASpace>
-            <ASpace class="right" size="large" style="font-size:12px;color:#8e8e8e" v-if="uid===currentSolution?.schoolId">
-              <span @click="handleEdit"><EditOutlined class="icon"/>修改</span>
-               <span ><APopconfirm
-                  title="确定删除该题解?"
-                  ok-text="是"
-                  cancel-text="否"
-                  @confirm="handleDelete"
-                  ><delete-outlined class="icon" />删除</APopconfirm></span>
+            <ASpace class="right" size="large" style="font-size:12px;color:#8e8e8e"
+              v-if="uid === currentSolution?.schoolId">
+              <span @click="handleEdit">
+                <EditOutlined class="icon" />修改
+              </span>
+              <span>
+                <APopconfirm title="确定删除该题解?" ok-text="是" cancel-text="否" @confirm="handleDelete"><delete-outlined
+                    class="icon" />删除</APopconfirm>
+              </span>
             </ASpace>
             <ADivider style="margin:16px 0"> </ADivider>
-            <RichTextEditor class="solution-content" :modelValue="currentSolution?.content" :readonly="true" :scroll="false"/>
+            <RichTextEditor class="solution-content" v-model="currentSolution.content" :readonly="true"
+              :scroll="false" />
             <ADivider style="margin:16px 0"> </ADivider>
             <h3 class="title"><span style="font-size: 20px;">{{
                 currentSolution?.comments?.length ? currentSolution?.comments?.length : 0
             }}</span> 条评论</h3>
             <div class="comment">
-              <ATextarea v-model:value="comment" placeholder="请输入评论内容" :auto-size="{ minRows: 4, maxRows: 7 }"/>
+              <ATextarea v-model:value="comment" placeholder="请输入评论内容" :auto-size="{ minRows: 4, maxRows: 7 }" />
               <div style="display:flex;justify-content: flex-end;">
                 <AButton size="small" type="primary" @click="handleComment"
                   style="margin-top: 20px;margin-bottom: 20px;" class="submit-green">评论
@@ -407,11 +392,12 @@ const handleDelete=async()=>{
                   <AListItem style="flex-direction: column;align-items: flex-start;color: #595959;">
                     <div style="display:flex;justify-content: space-between;width:100%;">
                       <ASpace style="font-weight: 500;">
-                        {{ currentCommentUser[index + 1]?.username }} 
-                        <ATag v-if="currentCommentUser[index + 1]?.role==1" color="green" style="font-weight:700;border-radius:10px"> 学生 </ATag>
+                        {{ currentCommentUser[index + 1]?.username }}
+                        <ATag v-if="currentCommentUser[index + 1]?.role == 1" color="green"
+                          style="font-weight:700;border-radius:10px"> 学生 </ATag>
                         <ATag v-else color="blue" style="font-weight:700;border-radius:10px"> 老师 </ATag>
                       </ASpace>
-                        
+
                       <span style="color: #bfbfbf;display: flex;align-items: center;">
                         评论于
                         <div class="dot"></div>
@@ -452,7 +438,7 @@ const handleDelete=async()=>{
               </div>
               <div class="code-editor">
                 <MonacoEditor :theme="editorProps.theme" :width="editorProps.width" :height="editorProps.height"
-                  :defaultValue="editorProps.defaultValue" :language="editorProps.language" v-model:value="answer" />
+                  :language="editorProps.language" v-model:value="answer" />
                 <ADivider style="margin:16px 0"> </ADivider>
                 <div style="display: flex;justify-content:end;">
                   <AButton type="primary" @click="submitCode" class="submit-green">
@@ -462,7 +448,7 @@ const handleDelete=async()=>{
             </div>
             <div v-else>
               <h3>题目答案</h3>
-              <RichTextEditor v-model="answer" placeholder="请输入答案" style="margin-top: 20px;"/>
+              <RichTextEditor v-model="answer" placeholder="请输入答案" style="margin-top: 20px;" />
               <ADivider style="margin:16px 0"> </ADivider>
               <div style="display: flex;justify-content:end;">
                 <AButton type="primary" @click="submitCode" class="submit-green">
@@ -475,8 +461,9 @@ const handleDelete=async()=>{
     </div>
   </div>
   <!-- 题目答案 -->
-  <AModal v-if="problem.ans!='<p><br></p>'&&problem.ans!=''" v-model:visible="ansVisible" @ok="handleAnsVisible" :cancelable="false" title="本题参考答案" :keyboard="true" width="38vw">
-    <RichTextEditor  v-model="problem.ans" :readonly="true"/>
+  <AModal v-if="problem.ans != '<p><br></p>' && problem.ans != ''" v-model:visible="ansVisible" @ok="handleAnsVisible"
+    :cancelable="false" title="本题参考答案" :keyboard="true" width="38vw">
+    <RichTextEditor v-model="problem.ans" :readonly="true" />
   </AModal>
 </template>
 

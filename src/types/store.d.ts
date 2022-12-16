@@ -1,7 +1,3 @@
-import { number } from "echarts"
-import { type } from "os"
-import { UUID } from "./public"
-
 export namespace User {
   interface userInfo {
     name: string // 实名
@@ -29,7 +25,7 @@ export namespace Problem {
 
   interface problem {
     // TODO: 具体命名id
-    id: UUID // 题目id
+    id: number // 题目id
     title: string // 题目标题
     question: string // 题目内容
     courseName: string // 课程
@@ -58,7 +54,7 @@ export namespace Problem {
 
 export namespace Favor {
   interface favorite {
-    id: UUID // id
+    id: number // id
     title: string // 题目搜索
     subject: string // 学科
     count: number // 做过人数
@@ -73,16 +69,16 @@ export namespace Favor {
 
 export namespace Solution {
   interface solution {
-    id: UUID
+    id: number
     title: string
     content: string
-    schoolId: UUID
+    schoolId: number
     comments: Comment[]
-    createAt: string
+    createdAt: string
   }
 
   interface Comment {
-    id: UUID // 评论id
+    id: number // 评论id
     schoolId: number // 发布人id
     content: string // 文本
     status: boolean // 审核状态

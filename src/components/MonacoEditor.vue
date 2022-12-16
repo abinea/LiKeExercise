@@ -5,23 +5,19 @@ import Editor, { useMonaco } from '@guolao/vue-monaco-editor'
 export default defineComponent({
   props: {
     height: {
-      type: String as PropType<string>,
+      type: String,
       default: '80vh'
     },
     theme: {
-      type: String as PropType<string>,
+      type: String,
       default: 'light'
     },
-    defaultValue: {
-      type: String as PropType<string>,
-      default: '// some comment'
-    },
     language: {
-      type: String as PropType<string>,
+      type: String,
       default: 'python'
     },
     style: {
-      type: String as PropType<string>,
+      type: String,
       default: ''
     }
   },
@@ -33,11 +29,10 @@ export default defineComponent({
       return h(Editor, {
         height: this.height,
         theme: this.theme,
-        defaultValue: this.defaultValue,
         language: this.language,
         style: this.style,
         onMount: (editor, monaco) => {
-          console.log('editor mounted', editor, monaco)
+          console.log('代码编辑器 Mounted', editor, monaco)
         },
       })
   }

@@ -1,32 +1,22 @@
 
 <script lang="ts" setup>
 import '@wangeditor/editor/dist/css/style.css';
-import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
-import { IToolbarConfig, DomEditor } from '@wangeditor/editor';
+import { IToolbarConfig } from '@wangeditor/editor';
 
-const props = defineProps(
-  {
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      default: '请输入内容...',
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-    scroll: {
-      type: Boolean,
-      default: true,
-    },
-  },
-);
+const props = withDefaults(defineProps<{
+  modelValue: string
+  placeholder: string
+  readonly: boolean
+  scroll: boolean
+}>(), {
+  modelValue: '',
+  placeholder: '请输入内容...',
+  readonly: false,
+  scroll: true
+});
+const emit = defineEmits(['update:modelValue']) // 结合 props.modelValue 实现 v-model 双绑定
 
-const emit = defineEmits(['update:modelValue'])
 const editorRef = shallowRef(); // 编辑器实例，必须用 shallowRef
 const value = computed({
   get() {
@@ -35,7 +25,7 @@ const value = computed({
   set(value) {
     emit('update:modelValue', value)
   }
-}) // 内容 HTML
+})
 const toolbarConfig: Partial<IToolbarConfig> = {
   toolbarKeys: [
     "headerSelect",
@@ -85,14 +75,13 @@ const toolbarConfig: Partial<IToolbarConfig> = {
     },
   ]
 }
-const editorConfig = { placeholder: props.placeholder,scroll:props.scroll };
+const editorConfig = { placeholder: props.placeholder, scroll: props.scroll, readOnly: props.readonly };
 
 // 组件挂载
 onMounted(() => {
   console.log("富文本编辑器 Mounted");
-
 });
-// 组件销毁时，也及时销毁编辑器
+// 组件销毁时也销毁编辑器
 onBeforeUnmount(() => {
   const editor = editorRef.value;
   if (editor == null) return;
@@ -103,22 +92,15 @@ onBeforeUnmount(() => {
 const handleCreated = (editor: any) => {
   editorRef.value = editor;
 };
-const handleChange = (editor: any) => {
-  if (editor == null) return;
-  if (props.readonly){
-    editor.disable()
-  }
-};
 </script>
 
 <template>
   <div>
-    <div :style="props.readonly?'':'border: 1px solid #ccc;'">
+    <div :style="props.readonly ? '' : 'border: 1px solid #ccc;'">
       <Toolbar v-if="!props.readonly" :editor="editorRef" :defaultConfig="toolbarConfig" mode="default"
         style="border-bottom: 1px solid #ccc" />
-      <Editor :defaultConfig="editorConfig" mode="default" v-model="value" :style="props.scroll?'height: 400px;overflow-y: hidden':''"
-        @onCreated="handleCreated"
-        @onChange="handleChange" />
+      <Editor :defaultConfig="editorConfig" mode="default" v-model="value"
+        :style="props.scroll ? 'height: 400px;overflow-y: hidden' : ''" @onCreated="handleCreated" />
     </div>
   </div>
 </template>

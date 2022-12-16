@@ -1,5 +1,5 @@
 import { User } from "@/types/store"
-import { LoginForm, MessageResponse, RegisterForm } from "@/types/request"
+import { LoginForm, MessageResponse } from "@/types/request"
 import service from "./service"
 
 function login(data: LoginForm): Promise<MessageResponse | { token: string }> {

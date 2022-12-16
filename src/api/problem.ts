@@ -22,7 +22,7 @@ function problemTags(): Promise<Problem.Tag[]> {
   })
 }
 
-function problemCreate(data: any) {
+function problemCreate(data: any):Promise<MessageResponse> {
   return service({
     method: "POST",
     url: "/v1/problem/create",

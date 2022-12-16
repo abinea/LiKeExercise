@@ -1,5 +1,5 @@
 import { MessageResponse } from "@/types/request"
-import { Problem, Solution } from "@/types/store"
+import { Solution } from "@/types/store"
 import service from "./service"
 
 function solutionAll(
@@ -22,7 +22,7 @@ function solutionCreate(
     title: string
     content: string
   }
-) {
+): Promise<MessageResponse> {
   return service({
     method: "POST",
     url: `/v1/problem/${problemId}/solution`,
@@ -86,7 +86,7 @@ function solutionUpdate( problemId: number, solutionId: number, data: {
   title: string
   content: string,
   schoolId: number
-}){
+}): Promise<MessageResponse>{
   return service({
     method: "PUT",
     url: `/v1/problem/${problemId}/solution/${solutionId}`,

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { PropType } from 'vue';
+import { formatTerm } from "@/utils/formatUtils"
 
 const router = useRouter()
 
@@ -16,14 +17,6 @@ const props = defineProps({
 })
 const classInfo = props.classInfo
 
-const navigateToClassDetail = () => { }
-
-function formatTerm(term: string) {
-  let [year1, year2, semester] = term.split('-')
-  semester = semester === '1' ? '一' : '二'
-  return `${year1}-${year2}学年 第${semester}学期`
-}
-
 const now = '2022-2023-1'
 const isEnded = computed(() => {
   return classInfo.term < now
@@ -32,13 +25,13 @@ const isEnded = computed(() => {
     
 <template>
   <div class="classInfo" :class="isEnded ? 'ended' : ''">
-    <p class="title">
+    <p class="class-item">
       班级：{{ classInfo.title }}
     </p>
-    <p class="title">
+    <p class="class-item">
       开课时间：{{ formatTerm(classInfo.term) }}
     </p>
-    <p class="title">
+    <p class="class-item">
       学生人数: {{ classInfo.studentNum }}
     </p>
   </div>
@@ -58,13 +51,13 @@ const isEnded = computed(() => {
     transition: all .2s ease-in-out 0s;
     box-shadow: 0 0.125rem 0.625rem rgba(175, 187, 204, 0.5);
   }
-}
 
-.title {
-  margin-top: 24px;
-  margin-left: 26px;
-  text-overflow: ellipsis;
-  line-height: 25px;
+  .class-item {
+    margin-top: 24px;
+    margin-left: 26px;
+    text-overflow: ellipsis;
+    line-height: 25px;
+  }
 }
 
 .ended {
