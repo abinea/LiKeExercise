@@ -14,7 +14,8 @@ import { userStore } from '@/store';
 
 const store = userStore()
 const avatar = ref('./src/assets/default.png')
-const { username } = store.userInfo
+const username = computed<string>(() =>
+  store.userInfo.username)
 </script>
 
 <style scoped>

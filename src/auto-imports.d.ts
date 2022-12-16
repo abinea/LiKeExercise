@@ -12,6 +12,7 @@ declare global {
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']
   const effectScope: typeof import('vue')['effectScope']
+  const formatDate: typeof import('./utils/formatDate')['default']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getCookie: typeof import('./utils/cookie')['getCookie']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']

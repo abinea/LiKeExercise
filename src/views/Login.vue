@@ -12,7 +12,7 @@ const router = useRouter();
 const remember = ref(getStorage('remember') || false);
 // 登录表单
 const loginForm: UnwrapRef<LoginForm> = reactive({
-  account: store.userInfo.email || store.userInfo.schoolId || getStorage("account"),
+  account: store.userInfo.email||store.userInfo.schoolId|| getStorage("account"),
   password: store.userInfo.password || (remember.value ? getStorage("password") : ""),
 })
 console.log(store.userInfo.email, store.userInfo.password);
@@ -33,6 +33,8 @@ const handleFinish: FormProps['onFinish'] = async () => {
   if ("token" in res) {
     setCookie('token', res.token)
     await message.loading("登陆成功，跳转中...", 0.5)
+    const userInfo=await userApi.info()
+    store.setUserInfo(userInfo)
     router.push("/home");
   }
 };
@@ -89,6 +91,12 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
 
 
 <style scoped lang="less">
+#app {
+  width: 100vw;
+  height: 100vh;
+  background-color: #f2f4f7;
+}
+
 .login {
   &-page {
     display: flex;

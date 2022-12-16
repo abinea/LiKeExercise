@@ -6,6 +6,7 @@ import { ECharts, EChartsOption, init } from 'echarts';
  * 定义引入Echart饼图及统计数据的hook函数，抽离这部分业务逻辑
  */
 export function useCharts() {
+
   // 图表数据
   let chartData = {
     difficulty: [{
@@ -68,6 +69,11 @@ export function useCharts() {
     chartEch = init(chartEle.value);
     // 加载数据
     chartEch.setOption(option as unknown, true);
+  })
+
+  onUnmounted(() => {
+    chartEch = null
+
   })
 
   const cardActiveKey = ref('difficulty')

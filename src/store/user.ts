@@ -10,7 +10,6 @@ export default defineStore("user", {
       username: "", // 实名
       schoolId: 0, // 学号/教工号
       role: 0,
-      gender: "", // 性别
       avatar: "", // 头像路径，有默认头像
     },
   }),

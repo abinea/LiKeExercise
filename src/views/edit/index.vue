@@ -15,7 +15,8 @@ const problem = reactive({
   category: "选择",
   courseName: "",
   difficulty: 1,
-  tags: []
+  tags: [],
+  ans: ""
 })
 
 onBeforeMount(async () => {
@@ -30,6 +31,7 @@ onBeforeMount(async () => {
     problem.courseName = res.courseName
     problem.difficulty = res.difficulty
     problem.tags = res.tags
+    problem.ans = res.ans
     showTags.value = res.tags.map((tag) => tag['tagName'])
   }
 
@@ -55,14 +57,9 @@ const selectTags = (tags: any[]) => {
 const isSelectProblem = computed(() => {
   return problem.category == categoryArr[1]
 })
-const isDati = computed(() => {
-  return problem.category == categoryArr[3] || problem.category == categoryArr[4]
-})
 
 const showTags = ref([])
 const questionTinymce = ref(null)
-
-const ansContent = ref('')
 
 // 多选开关
 const checked = ref<boolean>(false)
@@ -106,32 +103,32 @@ async function handleEdit() {
       </a-select>
     </section>
     <a-divider />
-    <main style="width:80%" class="edit-problem">
-      <div style="flex:1 0 auto;box-sizing:border-box;">
+    <main style="width: 80%" class="edit-problem">
+      <div style="box-sizing:border-box;width: 70%">
         <AInput size="large" placeholder="请输入题目标题" v-model:value="problem.title" />
-        <Tinymce ref="questionTinymce" placeholder="请输入题目描述" v-model:value.async="problem.question"
-          style="margin-top: 30px;" />
-
+          <RichTextEditor placeholder="请输入题目描述，如需填空请使用下划线替代" v-model="problem.question" style="margin-top: 30px;" />
         <div v-if="isSelectProblem" class="font-strong" style="margin-top:20px">
-          <label>多选：</label>
-          <ASwitch v-model:checked="checked">开启</ASwitch>
-        </div>
+          <div v-if="problem.category==='选择'">
+            <label >多选：</label>
+            <ASwitch v-model:checked="checked"></ASwitch>
+          </div>
 
-        <div class="font-strong" style="margin-top:20px">
+         <!-- <div class="font-strong" style="margin-top:20px">
           <span> {{ isSelectProblem ? "选项" : isDati ? problem.category == categoryArr[4] ? "代码题解" : "大题答案" : "填空答案" }}
           </span>
           <span v-show="isSelectProblem" class="right" style="margin-right: 30px;">正确答案</span>
-        </div>
-        <div v-if="!isDati">
+        </div> -->
           <div v-for="(_, index) in ansNum" class="flex-center" style="margin:20px 0">
             <span style="width: 30px;">{{ index + 1 }}.</span>
             <AInput style="background-color: #fafafa;" />
-            <a-checkbox v-if="isSelectProblem" style="transform: scale(1.2);margin-left:30px;" />
+             <ACheckbox v-if="isSelectProblem" style="transform: scale(1.2);margin-left:30px;" /> 
             <MinusOutlined @click="delAns" style="margin-left:30px;" />
           </div>
           <PlusOutlined @click="addAns" />
         </div>
-        <Tinymce v-else placeholder="请输入题目答案" v-model:value="ansContent" style="margin: 20px 0;"></Tinymce>
+        <!-- 因无判题故修改 -->
+        <div class="font-strong" style="margin-top:20px">题目答案</div>
+        <RichTextEditor placeholder="请输入题目答案" v-model="problem.ans" style="margin: 20px 0;" />
         <ADivider />
       </div>
       <div class="property">
@@ -170,6 +167,7 @@ async function handleEdit() {
 
 .edit-problem {
   display: flex;
+  width: 100%;
 }
 
 .property {

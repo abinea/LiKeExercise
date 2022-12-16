@@ -20,6 +20,14 @@ export default defineComponent({
       type: String,
       default: ''
     },
+    width: {
+      type: String,
+      default: '100%'
+    },
+    height: {
+      type: String,
+      default: '400px'
+    }
   },
   setup(props, context) {
     const content = ref("");
@@ -37,7 +45,8 @@ export default defineComponent({
         placeholder: props.placeholder,
         min_width: 300,
         min_height: 220,
-        height: 400, // 引入autoresize插件后失效
+        width: props.width, // 编辑器宽度
+        height: props.height, // 引入autoresize插件后失效
         resize: "true", // 编辑器宽高是否可变，false-否,true-高可变，'both'-宽高均可
         statusbar: false,  // 状态栏（元素路径、字数统计）是否显示
         // elementpath: false, // 元素路径是否显示
@@ -48,8 +57,7 @@ export default defineComponent({
           "image", "charmap", "codesample", "link", "advlist", "help"]
         ,
         toolbar: [
-          "undo redo |  outdent indent bullist numlist codesample table image charmap hr  help fullscreen",
-          "formatselect | bold italic underline strikethrough forecolor backcolor  subscript superscript removeformat",
+          "undo redo | formatselect | bold italic underline strikethrough forecolor backcolor  subscript superscript removeformat| outdent indent bullist numlist codesample table image charmap hr  help fullscreen",
         ], // 工具栏配置，false-隐藏，不配置该属性-默认采用简单配置，也可自定义配置
         // toolbar: [ //数组写法
         //   'undo redo | bold italic | link image',

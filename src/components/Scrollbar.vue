@@ -25,8 +25,12 @@ const scrollbar = shallowRef<OverlayScrollbars | null>(null)
 const scrollbarDom = shallowRef<HTMLElement>(document.createElement(props.tag))
 
 onMounted(() => {
-  scrollbar.value = OverlayScrollbars(scrollbarDom.value as HTMLElement, Object.assign(getDirectionOptions(), props.initOptions || {}))
-  listenWheel()
+  try {
+    scrollbar.value = OverlayScrollbars(scrollbarDom.value as HTMLElement, Object.assign(getDirectionOptions(), props.initOptions || {}))
+    listenWheel()
+  } catch (e) {
+    console.error(e)
+  }
 })
 
 onBeforeUnmount(() => {

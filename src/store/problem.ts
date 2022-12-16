@@ -21,7 +21,6 @@ export default defineStore("problem", {
   actions: {
     setProblemList(problemList: Problem.problem[]) {
       this.problemList = problemList
-      console.log(problemList);
     },
     setTags(tags: Problem.Tag[]) {
       this.tags = tags

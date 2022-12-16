@@ -28,13 +28,29 @@ function toggleSidebar() {
   }
 }
 
+const props = defineProps(
+  {
+    isSingle: {
+      type: Boolean,
+      default: false
+    }
+  }
+)
+
+const navigateBack = () => {
+  router.back()
+}
+
 </script>
 
 <template>
   <header>
     <section>
-      <MenuFoldOutlined :class="['icon-sidebar-trigger', sidebarRelated?.collapsed && 'collapsed']"
-        @click="toggleSidebar" />
+      <MenuFoldOutlined v-if="!props.isSingle"
+        :class="['icon-sidebar-trigger', sidebarRelated?.collapsed && 'collapsed']" @click="toggleSidebar" />
+      <span v-else style="font-size: 1.125rem;font-weight: 500; margin-left: 1rem;" @click="navigateBack">
+        <LeftOutlined /> 返回题库
+      </span>
     </section>
     <section style="font-size: 1.125rem;">
       <ASpace size="middle" style="margin-right: 1rem">

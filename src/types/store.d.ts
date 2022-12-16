@@ -1,5 +1,6 @@
 import { number } from "echarts"
 import { type } from "os"
+import { UUID } from "./public"
 
 export namespace User {
   interface userInfo {
@@ -39,6 +40,7 @@ export namespace Problem {
     favour: boolean // 是否收藏
     pass: boolean // 是否做过
     schoolId: number // 出题人id
+    ans: string // 题目答案
     deletedAt?: Date
   }
 
@@ -66,5 +68,29 @@ export namespace Favor {
 
   interface favorSet {
     data: favorite[]
+  }
+}
+
+export namespace Solution {
+  interface solution {
+    id: UUID
+    title: string
+    content: string
+    schoolId: UUID
+    comments: Comment[]
+    createAt: string
+  }
+
+  interface Comment {
+    id: UUID // 评论id
+    schoolId: number // 发布人id
+    content: string // 文本
+    status: boolean // 审核状态
+    reply: number
+    createdAt: string
+  }
+  interface CommentUser {
+    username: string
+    role: number
   }
 }

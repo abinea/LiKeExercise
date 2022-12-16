@@ -2,10 +2,12 @@ import { MessageResponse } from "@/types/request"
 import { Problem } from "@/types/store"
 import service from "./service"
 
-function problemList(data: Problem.filters = {
-  offset: 0,
-  limit: 10
-}): Promise<Problem.problem[]> {
+function problemList(
+  data: Problem.filters = {
+    offset: 0,
+    limit: 10,
+  }
+): Promise<{ problems: Problem.problem[]; problemsNumber: number }> {
   return service({
     method: "POST",
     url: "/v1/problem/allWithTag",
@@ -72,6 +74,16 @@ function problemModify(problemId: number, data: any): Promise<Problem.problem> {
   })
 }
 
+function problemCommit(problemId: number): Promise<MessageResponse> {
+  return service({
+    method: "GET",
+    url: "/v1/problem/commit",
+    params: {
+      problemId,
+    },
+  })
+}
+
 const problemApi = {
   problemList,
   problemCreate,
@@ -81,7 +93,7 @@ const problemApi = {
   problemDelete,
   problemDetail,
   problemModify,
+  problemCommit
 }
-
 
 export default problemApi

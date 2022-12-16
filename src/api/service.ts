@@ -25,7 +25,6 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (res) => {
     const body = res.data
-    console.log(body)
     if (body.code) {
       message.error(body.message || "请求失败，请检查数据是否正确", 2)
       return Promise.reject(new Error(body.message))

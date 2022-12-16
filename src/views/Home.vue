@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { userStore } from '@/store';
 import { SelectValue } from 'ant-design-vue/es/select'
-import { Modal } from 'ant-design-vue';
 
 const store = userStore()
-const role = store.userInfo.role
+const role = computed(() => store.userInfo.role)
 
 const searchValue = ref('')
 function searchChange(value: SelectValue) {

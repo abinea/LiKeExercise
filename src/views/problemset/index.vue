@@ -8,7 +8,6 @@ import { Problem } from "@/types/store"
 import problemApi from "@/api/problem"
 
 const router = useRouter()
-
 const store = problemStore()
 const { difficultyArr, categoryArr } = store
 const problemList = computed(() => store.problemList)
@@ -17,23 +16,23 @@ const courses = computed(() => store.courses)
 const hotList = ref<Problem.problem[]>([])
 // Echart饼图
 const { chartEle, changeChart, cardActiveKey, evaluteChartData } = useCharts()
-
 // 初始化数据
 onBeforeMount(async () => {
-  const problemList = await problemApi.problemList()
+  const { problems: problemList, problemsNumber } = await problemApi.problemList()
+  pagination.total = problemsNumber
   console.log(problemList);
   store.setProblemList(problemList)
   evaluteChartData(problemList)
   const tags = await problemApi.problemTags()
   store.setTags(tags)
-  hotList.value = await problemApi.problemList({
+  hotList.value = (await problemApi.problemList({
     "orders": [{
       "orderBy": "cnt", // 按通过数排序
       "sortOrder": "DESC" // 降序
     }],
     "offset": 0, // 偏移
     "limit": 10 // 分页大小
-  })
+  })).problems
   // TODO:课程列表
 })
 
@@ -55,7 +54,8 @@ const filters = reactive<Problem.filters>({
 })
 watch(() => filters, () => {
   problemApi.problemList(filters).then(res => {
-    store.setProblemList(res)
+    store.setProblemList(res.problems)
+    pagination.total = res.problemsNumber
   })
 }, { deep: true })
 
@@ -97,7 +97,7 @@ function difficultyColor(difficulty: number) {
 }
 
 // 表格列配置
-const role = 2 || userStore().userInfo.role
+const role = userStore().userInfo.role
 
 const columns: ColumnsType = [{
   title: '编号',
@@ -168,7 +168,8 @@ async function handleFavour(row: any) {
 async function handleDelete(id: number) {
   const res = await problemApi.problemDelete(id)
   if (res.code === 0) {
-    const problemList = await problemApi.problemList(filters)
+    const { problems: problemList,problemsNumber } = await problemApi.problemList(filters)
+    pagination.total = problemsNumber
     evaluteChartData(problemList)
     store.setProblemList(problemList)
     message.success("删除成功")
@@ -194,14 +195,16 @@ async function handleDelete(id: number) {
 // };
 
 // 分页控制
-const pagination: TablePaginationConfig = {
+const pagination = reactive<TablePaginationConfig>({
   pageSize: 10, // 默认每页显示数量
   showSizeChanger: true, // 显示可改变每页数量
   pageSizeOptions: ["10", "20", "30", "40"], // 每页数量选项
   current: 1,
-  total: 20
-}
-
+  total: 0,
+  showTotal: ((total) => {
+    return `共 ${total} 条`;
+  })
+})
 // 表格分页、筛选、排序处理
 const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
   // pagination
@@ -237,6 +240,16 @@ const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
   }
 }
 
+const randomProblem = () => {
+  if (problemList.value.length > 0) {
+    const randomIndex = Math.floor(Math.random() * problemList.value.length)
+    const randomProblem = problemList.value[randomIndex]
+    router.push({
+      path: "/problem/" + randomProblem.id
+    })
+  }
+}
+
 </script>
 
 <template>
@@ -268,14 +281,20 @@ const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
           <a-tab-pane v-for="category in categoryArr" :key="category" :tab="category">
           </a-tab-pane>
         </a-tabs>
-        <span class="right" style="display:flex;align-items: center;margin-top:5px; margin-right:60px;color:#7B88FF;">
+        <span class="right" style="display:flex;align-items: center;margin-top:5px; margin-right:60px;color:#7B88FF;"
+          @click="randomProblem">
           <span class="random shadow">
             <Random color="#fff" />
           </span>随机一题
         </span>
         <a-table :columns="columns" :data-source="problemList" :pagination="pagination" @change="handleTableChange">
           <template #bodyCell="{ column, record }">
-            <template v-if="column.dataIndex === 'difficulty'">
+            <template v-if="column.dataIndex === 'title'">
+              <RouterLink :to="{ path: `/problem/${record.id}` }" class="link">
+                {{ record.title }}
+              </RouterLink>
+            </template>
+            <template v-else-if="column.dataIndex === 'difficulty'">
               <div :class="difficultyColor(record.difficulty)">
                 {{ difficultyArr[record.difficulty] }}
               </div>
@@ -300,7 +319,7 @@ const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
         </a-table>
       </div>
       <div class="card-container">
-        <div class=" top card shadow">
+        <div class=" top card shadow" v-if="role===2">
           <div class="align-center">
             <CarryOutOutlined class="icon" style="color: #27BD9E;" />
             <div style="margin-left: 5px;">我的题库</div>
@@ -324,9 +343,9 @@ const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
             <FireOutlined class="icon" style="color: #BD3124 ;" /> 热门题目
           </p>
           <a-list :data-source="hotList" class="hotProblemList">
-            <template #renderItem="{ item, index }">
+            <template #renderItem="{ item }">
               <a-list-item>
-                {{ index + 1 }}. {{ item.title }}
+                {{ item.id }}. {{ item.title }}
               </a-list-item>
             </template>
           </a-list>
@@ -401,21 +420,11 @@ const handleTableChange: TableProps['onChange'] = (pag, filter, sorter) => {
   margin-right: 6px;
 }
 
+.link {
+  color: #000;
 
-// 难度颜色
-.easy {
-  color: #81B337
-}
-
-.medium {
-  color: #E99D42
-}
-
-.hard {
-  color: #BD3124
-}
-
-.favour {
-  color: #FFBF6B;
+  &:hover {
+    color: @blue;
+  }
 }
 </style>
