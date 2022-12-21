@@ -1,6 +1,8 @@
 ## LikeExercise
 LikeExercise（荔课网练）作用是为学生和老师提供一个平台，方便在网课的时候可以使用该系统更好地给学生进行题目的练习。
 
+![Alt](https://repobeats.axiom.co/api/embed/bfb5ab2181f679ff7edc74243740092de43e5622.svg "Repobeats analytics image")
+
 ### 使用说明
 已实现功能包括：
 1. 用户管理
