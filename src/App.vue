@@ -7,6 +7,10 @@ import locale from "ant-design-vue/es/locale/zh_CN"
     <RouterView />
   </AConfigProvider>
 </template>
-<style scoped>
-
+<style lang="less">
+#app {
+  width: 100vw;
+  height: 100vh;
+  background-color: @login-background-color;
+}
 </style>

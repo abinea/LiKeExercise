@@ -93,12 +93,6 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
 
 
 <style scoped lang="less">
-#app {
-  width: 100vw;
-  height: 100vh;
-  background-color: #f2f4f7;
-}
-
 .login {
   &-page {
     display: flex;

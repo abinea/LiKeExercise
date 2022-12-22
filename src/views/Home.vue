@@ -72,9 +72,9 @@ const inviteCode = ref('')
 
 <template>
   <div class="home">
-    <AModal v-model:visible="modalVisible" :title="role.value === 1 ? '添加班级' : '新建班级'" ok-text="确认" cancel-text="取消"
+    <AModal v-model:visible="modalVisible" :title="role === 1 ? '添加班级' : '新建班级'" ok-text="确认" cancel-text="取消"
       @ok="hideModal">
-      <AForm v-if="(role.value === 1)">
+      <AForm v-if="(role === 1)">
         <AFormItem label="邀请码">
           <AInput v-model:value="inviteCode" />
         </AFormItem>
@@ -104,7 +104,7 @@ const inviteCode = ref('')
     </AAutoComplete>
     <div style="margin-top:40px;">
       <AButton type="primary" @click="showModal">
-        {{ role.value == 1 ? "添加班级" : '新建班级' }}
+        {{ role == 1 ? "添加班级" : '新建班级' }}
       </AButton>
     </div>
 

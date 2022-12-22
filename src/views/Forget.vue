@@ -93,7 +93,7 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
             <template #suffix>
               <AButton style="border-radius: 8px;" type="default" @click="handleGetCaptcha">
                 {{
-                    count.value === 0 ?
+                    count === 0 ?
                       "获取验证码" :
                       `${count}秒后重试`
                 }}
@@ -124,12 +124,6 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
 
 
 <style scoped lang="less">
-#app {
-  width: 100vw;
-  height: 100vh;
-  background-color: #f2f4f7;
-}
-
 .forget {
   &-back {
     position: absolute;

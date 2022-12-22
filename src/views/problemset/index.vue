@@ -311,7 +311,7 @@ const randomProblem = () => {
             <template v-else-if="column.dataIndex === 'actions'">
               <RouterLink :to="{ name: 'EditProblem', query: { id: record.id, title: record.title } }">修改</RouterLink>
               <ADivider type="vertical" />
-              <APopconfirm v-if="problemList.value.length" title="确定删除？" @confirm="handleDelete(record.id)">
+              <APopconfirm v-if="problemList.length" title="确定删除？" @confirm="handleDelete(record.id)">
                 <a>删除</a>
               </APopconfirm>
             </template>

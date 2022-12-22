@@ -44,10 +44,10 @@ export default defineConfig({
           hack: `true; @import "${resolve("src/styles/variable.less")}";`,
         },
         additionalData: `
-        @import "./src/styles/global.less";
-        @import "./src/styles/animation.less";
-        @import "./src/styles/transtion.less";
-        @import "./src/styles/antdv.less";
+        @import "${resolve("src/styles/global.less")}";
+        @import "${resolve("src/styles/animation.less")}";
+        @import "${resolve("src/styles/transtion.less")}";
+        @import "${resolve("src/styles/antdv.less")}";
         `,
         javascriptEnabled: true,
       },
