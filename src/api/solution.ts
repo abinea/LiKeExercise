@@ -1,8 +1,8 @@
-import service from './service'
+import service from './index'
 import type { MessageResponse } from '@/types/request'
 import type { Solution } from '@/types/store'
 
-function solutionAll(
+export function solutionAll(
   problemId: number,
   data = {
     offset: 0,
@@ -16,7 +16,7 @@ function solutionAll(
   })
 }
 
-function solutionCreate(
+export function solutionCreate(
   problemId: number,
   data: {
     title: string
@@ -30,7 +30,7 @@ function solutionCreate(
   })
 }
 
-function solutionDetail(
+export function solutionDetail(
   problemId: number,
   solutionId: number,
 ): Promise<Solution.solution> {
@@ -40,7 +40,7 @@ function solutionDetail(
   })
 }
 
-function solutionDetele(
+export function solutionDetele(
   problemId: number,
   solutionId: number,
 ): Promise<MessageResponse> {
@@ -50,7 +50,7 @@ function solutionDetele(
   })
 }
 
-function commentCreate(
+export function commentCreate(
   problemId: number,
   solutionId: number,
   comment: string,
@@ -64,7 +64,7 @@ function commentCreate(
   })
 }
 
-function commentDelete(
+export function commentDelete(
   problemId: number,
   solutionId: number,
   commentId: number,
@@ -75,14 +75,14 @@ function commentDelete(
   })
 }
 
-function commentUser(schoolId: number): Promise<Solution.CommentUser> {
+export function commentUser(schoolId: number): Promise<Solution.CommentUser> {
   return service({
     method: 'GET',
     url: `/user/${schoolId}`,
   })
 }
 
-function solutionUpdate(problemId: number, solutionId: number, data: {
+export function solutionUpdate(problemId: number, solutionId: number, data: {
   title: string
   content: string
   schoolId: number
@@ -93,16 +93,3 @@ function solutionUpdate(problemId: number, solutionId: number, data: {
     data,
   })
 }
-
-const solutionApi = {
-  solutionAll,
-  solutionDetail,
-  solutionCreate,
-  solutionUpdate,
-  solutionDetele,
-  commentCreate,
-  commentDelete,
-  commentUser,
-}
-
-export default solutionApi

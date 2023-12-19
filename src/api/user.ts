@@ -1,8 +1,8 @@
-import service from './service'
+import service from './index'
 import type { User } from '@/types/store'
 import type { LoginForm, MessageResponse } from '@/types/request'
 
-function login(data: LoginForm): Promise<MessageResponse | { token: string }> {
+export function login(data: LoginForm): Promise<MessageResponse | { token: string }> {
   return service({
     method: 'POST',
     url: '/login',
@@ -10,7 +10,7 @@ function login(data: LoginForm): Promise<MessageResponse | { token: string }> {
   })
 }
 
-function register(data: any) {
+export function register(data: any) {
   return service({
     method: 'POST',
     url: '/register',
@@ -18,14 +18,14 @@ function register(data: any) {
   })
 }
 
-function info(): Promise<User.userInfo> {
+export function info(): Promise<User.userInfo> {
   return service({
     method: 'GET',
     url: '/user/info',
   })
 }
 
-function resetCaptcha(params: { email: string }): Promise<MessageResponse> {
+export function resetCaptcha(params: { email: string }): Promise<MessageResponse> {
   return service({
     method: 'GET',
     url: '/resetPasswd',
@@ -33,7 +33,7 @@ function resetCaptcha(params: { email: string }): Promise<MessageResponse> {
   })
 }
 
-function resetValid(data: { email: string, captcha: string }): Promise<MessageResponse> {
+export function resetValid(data: { email: string, captcha: string }): Promise<MessageResponse> {
   return service({
     method: 'POST',
     url: '/resetPasswd',
@@ -41,21 +41,10 @@ function resetValid(data: { email: string, captcha: string }): Promise<MessageRe
   })
 }
 
-function resetPassword(data: { email: string, newPasswd: string }): Promise<MessageResponse> {
+export function resetPassword(data: { email: string, newPasswd: string }): Promise<MessageResponse> {
   return service({
     method: 'PUT',
     url: '/resetPasswd',
     data,
   })
 }
-
-const userApi = {
-  login,
-  register,
-  info,
-  resetCaptcha,
-  resetValid,
-  resetPassword,
-}
-
-export default userApi
