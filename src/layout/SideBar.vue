@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { resolve } from 'pathe'
-
-// path包es代码实现
 import { RouterLink } from 'vue-router'
 import { MenuItem, SubMenu } from 'ant-design-vue/es'
 import type { Component, Slots } from 'vue'

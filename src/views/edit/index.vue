@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { message } from 'ant-design-vue'
 import { problemStore } from '@/store'
-import problemApi from '@/api/problem'
 
 const router = useRouter()
 const id = useRoute().query?.id
@@ -22,10 +21,10 @@ const problem = reactive({
 const showTags = ref([])
 
 onBeforeMount(async () => {
-  const tags = await problemApi.problemTags()
+  const tags = await getProblemTags()
   store.setTags(tags)
   if (id !== undefined) {
-    const res = await problemApi.problemDetail(Number(id))
+    const res = await getProblemDetail(Number(id))
     problem.title = res.title
     problem.question = res.question
     problem.category = res.category
@@ -71,14 +70,14 @@ async function handleEdit() {
   const isFinish = Object.values(problem).every(Boolean)
   if (isFinish) {
     if (id !== undefined) {
-      const res: any = await problemApi.problemModify(Number(id), problem)
+      const res: any = await updateProblem(Number(id), problem)
       if (res.code === 0) {
         message.success('修改成功')
         router.push('/problem')
       }
     }
     else {
-      const res: any = await problemApi.problemCreate(problem)
+      const res: any = await createProblem(problem)
       if (res.code === 0) {
         message.success('新建题目')
         router.push('/problem')

@@ -7,7 +7,7 @@
     "useDefineForClassFields": true, // 不检查null和undefined为类型
     "baseUrl": "./",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "node",
 
     "paths": {
       "@": ["src"],

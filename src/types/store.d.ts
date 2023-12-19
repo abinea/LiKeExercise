@@ -90,3 +90,11 @@ export namespace Solution {
     role: number
   }
 }
+
+export namespace Class{
+  interface ClassInfo {
+    title: string
+    studentNum: number
+    term: string
+  }
+}

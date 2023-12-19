@@ -19,7 +19,7 @@ export default defineConfig({
         /\.vue\?vue/, // .vue
       ],
       imports: ['vue', 'vue-router', 'pinia'],
-      dirs: ['src/utils'],
+      dirs: ['src/utils', 'src/api'],
       dts: 'src/auto-imports.d.ts',
     }),
     // 自动导入使用组件

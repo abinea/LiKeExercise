@@ -1,7 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import {
-  FormOutlined,
   MessageOutlined,
   ScheduleOutlined,
   StarOutlined,
@@ -33,7 +32,6 @@ export const dashboardRoute: RouteRecordRaw = {
       path: '/edit',
       name: 'EditProblem',
       component: () => import('@/views/edit/index.vue'),
-      meta: { title: '编辑题目', icon: FormOutlined },
     },
     {
       path: '/notice',

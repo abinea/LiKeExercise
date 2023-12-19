@@ -1,13 +1,15 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import Icon from '@ant-design/icons-vue'
 
-const props = defineProps({
-  color: String,
-  fontSize: {
-    type: Number,
-    default: 20,
+const props = withDefaults(
+  defineProps<{
+    color: string
+    fontSize: number
+  }>(),
+  {
+    fontSize: 20,
   },
-})
+)
 </script>
 
 <template>
@@ -15,7 +17,7 @@ const props = defineProps({
     <Icon>
       <template #component>
         <svg
-          t=" 1668511884527"
+          t="1668511884527"
           class="icon"
           viewBox="0 0 1024 1024"
           version="1.1"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import userApi from '@/api/user'
+import { resetCaptcha, resetPassword, resetValid } from '@/api/user'
 
 const router = useRouter()
 
@@ -30,7 +30,7 @@ const isNext = ref(false)
 const count = ref(0)
 let timer: any = null
 async function handleGetCaptcha() {
-  const res = await userApi.resetCaptcha({ email: resetForm.email })
+  const res = await resetCaptcha({ email: resetForm.email })
   if (res.code === 0) {
     message.success('验证码已发送')
     count.value = 60
@@ -43,9 +43,9 @@ async function handleGetCaptcha() {
     }, 1000)
   }
 }
-const resetValid: FormProps['onFinish'] = async () => {
+const validate: FormProps['onFinish'] = async () => {
   // 提交数据
-  const res = await userApi.resetValid(resetForm)
+  const res = await resetValid(resetForm)
   if (res.code === 0) {
     isNext.value = true
     current.value++
@@ -53,7 +53,7 @@ const resetValid: FormProps['onFinish'] = async () => {
   }
 }
 async function reset() {
-  await userApi.resetPassword({
+  await resetPassword({
     email: resetForm.email,
     newPasswd: resetForm.password,
   })
@@ -141,7 +141,7 @@ const handleFinishFailed: FormProps['onFinishFailed'] = (errors) => {
             type="primary"
             html-type="submit"
             :disabled="resetForm.email === '' || resetForm.captcha === ''"
-            @click="resetValid"
+            @click="validate"
           >
             下一步
           </AButton>

@@ -2,8 +2,6 @@
 import { message } from 'ant-design-vue'
 import HeadBar from '@/layout/HeadBar.vue'
 import MonacoEditor from '@/components/MonacoEditor.vue'
-import problemApi from '@/api/problem'
-import solutionApi from '@/api/solution'
 import type { Solution } from '@/types/store'
 import { problemStore, userStore } from '@/store'
 import { formatDate } from '@/utils/formatUtils'
@@ -39,7 +37,7 @@ const currentCommentUser = ref<Solution.CommentUser[]>([])
 const solutionCount = ref(0)
 const currentId = ref(0)
 onBeforeMount(async () => {
-  const res = await solutionApi.solutionAll(id)
+  const res = await getAllSolution(id)
   solutionList.value = res.solutions
   solutionCount.value = res.solutionsNumber
   currentId.value = res.solutions[0]?.id || 0
@@ -61,15 +59,15 @@ const currentSolution = ref<Solution.solution>(null)
 watch(
   () => currentId.value,
   async (currentVal) => {
-    currentSolution.value = await solutionApi.solutionDetail(id, currentVal)
+    currentSolution.value = await getSolutionDetail(id, currentVal)
     // commentUser
     currentCommentUser.value = await Promise.all(
       currentSolution.value.comments.map(
-        async comment => await solutionApi.commentUser(comment.schoolId),
+        async comment => await getCommenter(comment.schoolId),
       ),
     )
     currentCommentUser.value.unshift(
-      await solutionApi.commentUser(currentSolution.value.schoolId),
+      await getCommenter(currentSolution.value.schoolId),
     )
   },
 )
@@ -92,7 +90,7 @@ const problem = reactive({
 })
 
 onBeforeMount(async () => {
-  const res = await problemApi.problemDetail(problem.id)
+  const res = await getProblemDetail(problem.id)
   problem.title = res.title
   problem.question = res.question
   problem.category = res.category
@@ -107,14 +105,14 @@ onBeforeMount(async () => {
 // 收藏
 async function handleFavour() {
   if (problem.favour) {
-    const res = await problemApi.problemCancelFavour(id)
+    const res = await cancelFavourProblem(id)
     if (res.code === 0) {
       message.success('取消收藏')
       problem.favour = false
     }
   }
   else {
-    const res = await problemApi.problemFavour(id)
+    const res = await favourProblem(id)
     if (res.code === 0) {
       message.success('收藏成功')
       problem.favour = true
@@ -143,32 +141,32 @@ async function handleSolution() {
   }
   else {
     if (!isEditing.value) {
-      await solutionApi.solutionCreate(id, solution.value)
+      await createSolution(id, solution.value)
     }
     else {
-      await solutionApi.solutionUpdate(id, currentId.value, {
+      await updateSolution(id, currentId.value, {
         ...solution.value,
         schoolId: uid.value,
       })
     }
 
-    const res = await solutionApi.solutionAll(id)
+    const res = await getAllSolution(id)
     if (solutionCount.value === 0)
       currentId.value = res.solutions[0]?.id || 0
 
     solutionList.value = res.solutions
     solutionCount.value = res.solutionsNumber
-    currentSolution.value = await solutionApi.solutionDetail(
+    currentSolution.value = await getSolutionDetail(
       id,
       currentId.value,
     )
     currentCommentUser.value = await Promise.all(
       currentSolution.value.comments.map(
-        async comment => await solutionApi.commentUser(comment.schoolId),
+        async comment => await getCommenter(comment.schoolId),
       ),
     )
     currentCommentUser.value.unshift(
-      await solutionApi.commentUser(currentSolution.value.schoolId),
+      await getCommenter(currentSolution.value.schoolId),
     )
     isCreateSolution.value = false
     isEditing.value = false
@@ -184,7 +182,7 @@ async function submitCode() {
     message.error('答案不能为空')
     return
   }
-  await problemApi.problemCommit(id)
+  await commitProblem(id)
   message.success('提交成功')
   if (problem.ans)
     ansVisible.value = true
@@ -198,16 +196,16 @@ async function handleComment() {
     message.error('评论不能为空')
     return
   }
-  await solutionApi.commentCreate(id, currentId.value, comment.value)
+  await createComment(id, currentId.value, comment.value)
   message.success('评论成功')
-  currentSolution.value = await solutionApi.solutionDetail(id, currentId.value)
+  currentSolution.value = await getSolutionDetail(id, currentId.value)
   currentCommentUser.value = await Promise.all(
     currentSolution.value.comments.map(
-      async comment => await solutionApi.commentUser(comment.schoolId),
+      async comment => await getCommenter(comment.schoolId),
     ),
   )
   currentCommentUser.value.unshift(
-    await solutionApi.commentUser(currentSolution.value.schoolId),
+    await getCommenter(currentSolution.value.schoolId),
   )
   comment.value = ''
 }
@@ -280,8 +278,8 @@ function handleEdit() {
 }
 
 async function handleDelete() {
-  await solutionApi.solutionDetele(id, currentId.value)
-  const res = await solutionApi.solutionAll(id)
+  await deleteSolution(id, currentId.value)
+  const res = await getAllSolution(id)
   solutionList.value = res.solutions
   solutionCount.value = res.solutionsNumber
   changeCurrentId(res.solutions[0]?.id || 0)

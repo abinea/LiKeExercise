@@ -5,7 +5,9 @@ import Logo from '@/assets/logo.png'
 import { fixedHeader, transitions } from '@/store/appConfig'
 import type { Layout } from '@/types/layout'
 
-const SideBar = defineAsyncComponent(() => import('./SideBar.vue')) as ReturnType<typeof defineComponent>
+const SideBar = defineAsyncComponent(
+  () => import('./SideBar.vue'),
+) as ReturnType<typeof defineComponent>
 const useSharedIsMobile = createSharedComposable(isMobile)
 const _isMobile = useSharedIsMobile(setSidebarCollapsed)
 
@@ -43,20 +45,31 @@ provide('loading', loading)
     >
       <div style="relative; z-index: 999; display: flex; flex-direction: column; width: 100%; height: 100%;">
         <RouterLink to="/">
-          <div v-if="(sidebarRelated.shadowCollapsed || sidebarRelated.collapsed)" class="flex-center logo-collapsed">
+          <div v-if="sidebarRelated.shadowCollapsed || sidebarRelated.collapsed" class="flex-center logo-collapsed">
             <img :src="Logo" alt="Logo" class="logo">
           </div>
-          <div v-else class="flex-center" style="display: flex;align-items: center;margin-top: 14px;">
+          <div v-else class="flex-center" style="display: flex; align-items: center; margin-top: 14px">
             <img :src="Logo" alt="Logo" class="logo">
-            <span style="line-height: 32px;font-size:24px;color:black;margin-left: 14px">荔课网练</span>
+            <span
+              style="
+                line-height: 32px;
+                font-size: 24px;
+                color: black;
+                margin-left: 14px;
+              "
+            >
+              荔课网练
+            </span>
           </div>
         </RouterLink>
         <Profile v-if="!sidebarRelated?.collapsed" />
         <SideBar />
       </div>
       <div
-        v-if="!_isMobile" class="sidebar-shadow"
-        :style="{ transform: `translate3d(${sidebarRelated.shadowCollapsed ? '-10rem' : '0'}, 0, 0)` }"
+        v-if="!_isMobile" class="sidebar-shadow" :style="{
+          transform: `translate3d(${sidebarRelated.shadowCollapsed ? '-10rem' : '0'
+          }, 0, 0)`,
+        }"
       />
     </ALayoutSider>
     <ALayout>
@@ -64,7 +77,7 @@ provide('loading', loading)
         <HeadBar />
       </ALayoutHeader>
       <ALayoutContent id="content-window">
-        <div v-if="!fixedHeader" style="padding: 0 1rem;">
+        <div v-if="!fixedHeader" style="padding: 0 1rem">
           <HeadBar />
         </div>
         <RouterView v-slot="{ Component, route }" class="content-view">
@@ -131,7 +144,7 @@ provide('loading', loading)
 
 .logo-collapsed {
   color: @sidebar-font-color;
-  font-size: .8rem;
+  font-size: 0.8rem;
   width: 100%;
   height: 3rem;
   text-align: center;

@@ -4,7 +4,6 @@ import type { FormProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import type { RegisterForm } from '@/types/request'
 import { userStore } from '@/store'
-import userApi from '@/api/user'
 import { isEmail } from '@/utils/validate'
 
 const store = userStore()
@@ -22,7 +21,7 @@ const registerForm = reactive<RegisterForm>({
 const handleFinish: FormProps['onFinish'] = async () => {
   const registerData: any = toRaw(registerForm)
   registerData.schoolId = Number(registerData.sid)
-  const res: any = await userApi.register(registerData)
+  const res: any = await register(registerData)
   if (!('code' in res)) {
     res.password = registerData.password
     store.setUserInfo(res)

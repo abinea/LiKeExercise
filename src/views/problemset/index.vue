@@ -2,9 +2,8 @@
 import { message } from 'ant-design-vue'
 import type { TableProps } from 'ant-design-vue/lib/table'
 import type { ColumnsType, SorterResult, TablePaginationConfig } from 'ant-design-vue/lib/table/interface'
-import { problemStore, userStore } from '@/store'
 import type { Problem } from '@/types/store'
-import problemApi from '@/api/problem'
+import { problemStore, userStore } from '@/store'
 
 const router = useRouter()
 const store = problemStore()
@@ -27,13 +26,13 @@ const pagination = reactive<TablePaginationConfig>({
 const { chartEle, changeChart, cardActiveKey, evaluteChartData } = useCharts()
 // 初始化数据
 onBeforeMount(async () => {
-  const { problems: problemList, problemsNumber } = await problemApi.problemList()
+  const { problems: problemList, problemsNumber } = await getProblemList()
   pagination.total = problemsNumber
   store.setProblemList(problemList)
   evaluteChartData(problemList)
-  const tags = await problemApi.problemTags()
+  const tags = await getProblemTags()
   store.setTags(tags)
-  hotList.value = (await problemApi.problemList({
+  hotList.value = (await getProblemList({
     orders: [{
       orderBy: 'cnt', // 按通过数排序
       sortOrder: 'DESC', // 降序
@@ -61,7 +60,7 @@ const filters = reactive<Problem.filters>({
   limit: 10, // 分页大小
 })
 watch(() => filters, () => {
-  problemApi.problemList(filters).then((res) => {
+  getProblemList(filters).then((res) => {
     store.setProblemList(res.problems)
     pagination.total = res.problemsNumber
   })
@@ -159,14 +158,14 @@ else {
 async function handleFavour(row: any) {
   const id = row.id
   if (row.favour) {
-    const res = await problemApi.problemCancelFavour(id)
+    const res = await cancelFavourProblem(id)
     if (res.code === 0) {
       message.success('取消收藏')
       row.favour = false
     }
   }
   else {
-    const res = await problemApi.problemFavour(id)
+    const res = await favourProblem(id)
     if (res.code === 0) {
       message.success('收藏成功')
       row.favour = true
@@ -176,9 +175,9 @@ async function handleFavour(row: any) {
 
 // [老师] 操作
 async function handleDelete(id: number) {
-  const res = await problemApi.problemDelete(id)
+  const res = await deleteProblem(id)
   if (res.code === 0) {
-    const { problems: problemList, problemsNumber } = await problemApi.problemList(filters)
+    const { problems: problemList, problemsNumber } = await getProblemList(filters)
     pagination.total = problemsNumber
     evaluteChartData(problemList)
     store.setProblemList(problemList)

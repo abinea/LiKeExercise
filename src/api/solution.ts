@@ -2,7 +2,7 @@ import service from './index'
 import type { MessageResponse } from '@/types/request'
 import type { Solution } from '@/types/store'
 
-export function solutionAll(
+export function getAllSolution(
   problemId: number,
   data = {
     offset: 0,
@@ -16,7 +16,7 @@ export function solutionAll(
   })
 }
 
-export function solutionCreate(
+export function createSolution(
   problemId: number,
   data: {
     title: string
@@ -30,7 +30,7 @@ export function solutionCreate(
   })
 }
 
-export function solutionDetail(
+export function getSolutionDetail(
   problemId: number,
   solutionId: number,
 ): Promise<Solution.solution> {
@@ -40,7 +40,7 @@ export function solutionDetail(
   })
 }
 
-export function solutionDetele(
+export function deleteSolution(
   problemId: number,
   solutionId: number,
 ): Promise<MessageResponse> {
@@ -50,7 +50,7 @@ export function solutionDetele(
   })
 }
 
-export function commentCreate(
+export function createComment(
   problemId: number,
   solutionId: number,
   comment: string,
@@ -64,7 +64,7 @@ export function commentCreate(
   })
 }
 
-export function commentDelete(
+export function deleteComment(
   problemId: number,
   solutionId: number,
   commentId: number,
@@ -75,14 +75,14 @@ export function commentDelete(
   })
 }
 
-export function commentUser(schoolId: number): Promise<Solution.CommentUser> {
+export function getCommenter(schoolId: number): Promise<Solution.CommentUser> {
   return service({
     method: 'GET',
     url: `/user/${schoolId}`,
   })
 }
 
-export function solutionUpdate(problemId: number, solutionId: number, data: {
+export function updateSolution(problemId: number, solutionId: number, data: {
   title: string
   content: string
   schoolId: number

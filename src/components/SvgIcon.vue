@@ -11,16 +11,19 @@ export default defineComponent({
   },
   render() {
     // 这里不能用jsx，Icon接收的component不会被再编译
-    const svg = () => h('svg', {
-      class: this.className,
-      width: this.width,
-      height: this.height,
-      fill: this.fill,
-    }, {
-      default: () => [
-        h('use', { 'xlink:href': `#svg-${this.iconName}` }),
-      ],
-    })
+    const svg = () =>
+      h(
+        'svg',
+        {
+          class: this.className,
+          width: this.width,
+          height: this.height,
+          fill: this.fill,
+        },
+        {
+          default: () => [h('use', { 'xlink:href': `#svg-${this.iconName}` })],
+        },
+      )
     return h(Icon, { component: svg })
   },
 })

@@ -1,43 +1,37 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import type { PropType } from 'vue'
+import type { Class } from '@/types/store'
 import { formatTerm } from '@/utils/formatUtils'
 
 const props = defineProps({
   classInfo: {
-    type: Object as PropType<ClassInfo>,
+    type: Object as PropType<Class.ClassInfo>,
     required: true,
   },
 })
 
-interface ClassInfo {
-  title: string
-  studentNum: number
-  term: string
-}
-const classInfo = props.classInfo
-
 const now = '2022-2023-1'
 const isEnded = computed(() => {
-  return classInfo.term < now
+  return props.classInfo.term < now
 })
 </script>
 
 <template>
-  <div class="classInfo" :class="isEnded ? 'ended' : ''">
+  <div class="class-info" :class="{ ended: isEnded }">
     <p class="class-item">
-      班级：{{ classInfo.title }}
+      班级：{{ props.classInfo.title }}
     </p>
     <p class="class-item">
-      开课时间：{{ formatTerm(classInfo.term) }}
+      开课时间：{{ formatTerm(props.classInfo.term) }}
     </p>
     <p class="class-item">
-      学生人数: {{ classInfo.studentNum }}
+      学生人数: {{ props.classInfo.studentNum }}
     </p>
   </div>
 </template>
 
 <style scoped lang="less">
-.classInfo {
+.class-info {
   height: 200px;
   background-color: @light-gray;
   box-shadow: 0 0 20px 0 rgba(175, 187, 204, 0.2);

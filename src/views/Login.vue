@@ -4,7 +4,6 @@ import type { FormProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import type { LoginForm } from '@/types/request'
 import { userStore } from '@/store'
-import userApi from '@/api/user'
 
 const store = userStore()
 const router = useRouter()
@@ -27,12 +26,12 @@ const handleFinish: FormProps['onFinish'] = async () => {
     removeStorage('password')
 
   // 提交数据
-  const res = await userApi.login(loginForm)
+  const res = await login(loginForm)
   if ('token' in res) {
     setCookie('token', res.token)
     await message.loading('登陆成功，跳转中...', 0.5)
-    const userInfo = await userApi.info()
-    store.setUserInfo(userInfo)
+    const info = await userInfo()
+    store.setUserInfo(info)
     router.push('/home')
   }
 }

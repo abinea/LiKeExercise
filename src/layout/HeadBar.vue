@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import type { Layout } from '@/types/layout'
 
-const props = defineProps(
-  {
-    isSingle: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  isSingle: {
+    type: Boolean,
+    default: false,
   },
-)
+})
 const sidebarRelated = inject<Layout.SidebarRelated>('sidebarRelated')
 const loading = inject<Layout.Loading>('loading')
 const router = useRouter()
@@ -48,21 +46,37 @@ function navigateBack() {
     <section>
       <MenuFoldOutlined
         v-if="!props.isSingle"
-        class="icon-sidebar-trigger" :class="[sidebarRelated?.collapsed && 'collapsed']" @click="toggleSidebar"
+        class="icon-sidebar-trigger"
+        :class="[sidebarRelated?.collapsed && 'collapsed']"
+        @click="toggleSidebar"
       />
-      <span v-else style="font-size: 1.125rem;font-weight: 500; margin-left: 1rem;" @click="navigateBack">
+      <span
+        v-else
+        style="font-size: 1.125rem; font-weight: 500; margin-left: 1rem"
+        @click="navigateBack"
+      >
         <LeftOutlined /> 返回题库
       </span>
     </section>
-    <section style="font-size: 1.125rem;">
+    <section style="font-size: 1.125rem">
       <ASpace size="middle" style="margin-right: 1rem">
-        <BellOutlined style="margin-right: .5rem" />
+        <BellOutlined style="margin-right: 0.5rem" />
         <SettingOutlined />
-        <ADivider type="vertical" style="background-color: #e1e1e1; height: 1rem; margin: 0" />
+        <ADivider
+          type="vertical"
+          style="background-color: #e1e1e1; height: 1rem; margin: 0"
+        />
       </ASpace>
-      <div style="display: inline-flex; align-items: center; cursor:pointer; margin-right: 1rem;">
+      <div
+        style="
+          display: inline-flex;
+          align-items: center;
+          cursor: pointer;
+          margin-right: 1rem;
+        "
+      >
         <span @click="logout">
-          <LogoutOutlined style="margin-right: .5rem;" /> 登出
+          <LogoutOutlined style="margin-right: 0.5rem" /> 登出
         </span>
       </div>
     </section>
@@ -84,7 +98,7 @@ header {
       align-items: center;
       flex-shrink: 0;
       overflow: hidden;
-      flex: 1
+      flex: 1;
     }
 
     &:last-of-type {

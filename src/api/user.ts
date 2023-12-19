@@ -18,7 +18,7 @@ export function register(data: any) {
   })
 }
 
-export function info(): Promise<User.userInfo> {
+export function userInfo(): Promise<User.userInfo> {
   return service({
     method: 'GET',
     url: '/user/info',

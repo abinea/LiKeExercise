@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import '@wangeditor/editor/dist/css/style.css'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import type { IToolbarConfig } from '@wangeditor/editor'
@@ -17,9 +17,9 @@ const props = withDefaults(
     scroll: true,
   },
 )
-const emit = defineEmits(['update:modelValue']) // 结合 props.modelValue 实现 v-model 双绑定
+const emit = defineEmits(['update:modelValue'])
 
-const editorRef = shallowRef() // 编辑器实例，必须用 shallowRef
+// 实现 v-model 双向绑定
 const value = computed({
   get() {
     return props.modelValue
@@ -28,6 +28,9 @@ const value = computed({
     emit('update:modelValue', value)
   },
 })
+
+// 编辑器实例，必须用 shallowRef
+const editorRef = shallowRef()
 const toolbarConfig: Partial<IToolbarConfig> = {
   toolbarKeys: [
     'headerSelect',
@@ -70,7 +73,16 @@ const toolbarConfig: Partial<IToolbarConfig> = {
     },
   ],
 }
-const editorConfig = { placeholder: props.placeholder, scroll: props.scroll, readOnly: props.readonly }
+const editorConfig = {
+  placeholder: props.placeholder,
+  scroll: props.scroll,
+  readOnly: props.readonly,
+}
+
+// 编辑器回调函数
+function handleCreated(editor: any) {
+  editorRef.value = editor
+}
 
 // 组件销毁时也销毁编辑器
 onBeforeUnmount(() => {
@@ -79,11 +91,6 @@ onBeforeUnmount(() => {
     return
   editor.destroy()
 })
-
-// 编辑器回调函数
-function handleCreated(editor: any) {
-  editorRef.value = editor
-}
 </script>
 
 <template>

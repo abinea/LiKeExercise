@@ -3,7 +3,6 @@ import 'nprogress/nprogress.css'
 import { message } from 'ant-design-vue'
 import router from './index'
 import { appTitle } from '@/store/appConfig'
-import userApi from '@/api/user'
 import { userStore } from '@/store'
 
 NProgress.configure({ showSpinner: false })
@@ -35,7 +34,7 @@ router.beforeEach(async (to, from, next) => {
       }
       else {
         const store = userStore()
-        const info = await userApi.info()
+        const info = await userInfo()
         store.setUserInfo(info)
         doneInfo = true
         next()
