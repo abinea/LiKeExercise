@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-
+import viteCompression from 'vite-plugin-compression'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
@@ -36,6 +36,9 @@ export default defineConfig({
       extensions: ['vue'],
       dts: 'src/components.d.ts',
     }),
+    viteCompression({
+      threshold: 1024 * 30,
+    }),
   ],
   css: {
     preprocessorOptions: {
@@ -57,5 +60,17 @@ export default defineConfig({
     alias: {
       '@': resolve('./src'),
     },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        chunkFileNames: 'js/[name]-[hash].js', // 引入文件名的名称
+        entryFileNames: 'js/[name]-[hash].js', // 包的入口文件名称
+        assetFileNames: '[ext]/[name]-[hash].[ext]', // 资源文件像 字体，图片等
+      },
+    },
+  },
+  esbuild: {
+    drop: ['console', 'debugger'],
   },
 })

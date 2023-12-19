@@ -40,7 +40,6 @@ onBeforeMount(async () => {
     offset: 0, // 偏移
     limit: 10, // 分页大小
   })).problems
-  // TODO:课程列表
 })
 
 // 筛选参数
