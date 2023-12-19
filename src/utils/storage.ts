@@ -13,11 +13,10 @@ export function setStorage(key: string, value: any) {
  */
 export function getStorage(key: string) {
   const value = localStorage.getItem(key)
-  if (value) {
+  if (value)
     return JSON.parse(value)
-  } else {
-    return ("")
-  }
+  else
+    return ('')
 }
 
 /**

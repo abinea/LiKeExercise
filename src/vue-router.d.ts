@@ -1,4 +1,4 @@
-import { Component } from "vue"
+import type { Component } from 'vue'
 
 declare module 'vue-router' {
   export interface RouteMeta {
@@ -37,7 +37,7 @@ declare module 'vue-router' {
     /**
      * 关闭标签页时确认询问
      */
-    askBeforeClose?: boolean,
+    askBeforeClose?: boolean
     /**
      * 关键字，可用于搜索协助
      */

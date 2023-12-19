@@ -1,39 +1,39 @@
-import { MessageResponse } from "@/types/request"
-import { Problem } from "@/types/store"
-import service from "./service"
+import service from './service'
+import type { MessageResponse } from '@/types/request'
+import type { Problem } from '@/types/store'
 
 function problemList(
   data: Problem.filters = {
     offset: 0,
     limit: 10,
-  }
-): Promise<{ problems: Problem.problem[]; problemsNumber: number }> {
+  },
+): Promise<{ problems: Problem.problem[], problemsNumber: number }> {
   return service({
-    method: "POST",
-    url: "/v1/problem/allWithTag",
+    method: 'POST',
+    url: '/v1/problem/allWithTag',
     data,
   })
 }
 
 function problemTags(): Promise<Problem.Tag[]> {
   return service({
-    method: "GET",
-    url: "/v1/problem/tag",
+    method: 'GET',
+    url: '/v1/problem/tag',
   })
 }
 
-function problemCreate(data: any):Promise<MessageResponse> {
+function problemCreate(data: any): Promise<MessageResponse> {
   return service({
-    method: "POST",
-    url: "/v1/problem/create",
+    method: 'POST',
+    url: '/v1/problem/create',
     data,
   })
 }
 
 function problemFavour(problemId: number): Promise<MessageResponse> {
   return service({
-    method: "GET",
-    url: "/v1/problem/collection",
+    method: 'GET',
+    url: '/v1/problem/collection',
     params: {
       problemId,
     },
@@ -42,8 +42,8 @@ function problemFavour(problemId: number): Promise<MessageResponse> {
 
 function problemCancelFavour(problemId: number): Promise<MessageResponse> {
   return service({
-    method: "DELETE",
-    url: "/v1/problem/collection",
+    method: 'DELETE',
+    url: '/v1/problem/collection',
     params: {
       problemId,
     },
@@ -52,7 +52,7 @@ function problemCancelFavour(problemId: number): Promise<MessageResponse> {
 
 function problemDelete(problemId: number): Promise<MessageResponse> {
   return service({
-    method: "DELETE",
+    method: 'DELETE',
     url: `/v1/problem/${problemId}`,
   })
 }
@@ -61,14 +61,14 @@ function problemDelete(problemId: number): Promise<MessageResponse> {
  */
 function problemDetail(problemId: number): Promise<Problem.problem> {
   return service({
-    method: "GET",
+    method: 'GET',
     url: `/v1/problem/${problemId}`,
   })
 }
 
 function problemModify(problemId: number, data: any): Promise<Problem.problem> {
   return service({
-    method: "PUT",
+    method: 'PUT',
     url: `/v1/problem/${problemId}`,
     data,
   })
@@ -76,8 +76,8 @@ function problemModify(problemId: number, data: any): Promise<Problem.problem> {
 
 function problemCommit(problemId: number): Promise<MessageResponse> {
   return service({
-    method: "GET",
-    url: "/v1/problem/commit",
+    method: 'GET',
+    url: '/v1/problem/commit',
     params: {
       problemId,
     },
@@ -93,7 +93,7 @@ const problemApi = {
   problemDelete,
   problemDetail,
   problemModify,
-  problemCommit
+  problemCommit,
 }
 
 export default problemApi

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Logo from '@/assets/logo.png'
 import HeadBar from './HeadBar.vue'
 import Profile from './Profile.vue'
-import { transitions, fixedHeader } from '@/store/appConfig'
+import Logo from '@/assets/logo.png'
+import { fixedHeader, transitions } from '@/store/appConfig'
 import type { Layout } from '@/types/layout'
 
 const SideBar = defineAsyncComponent(() => import('./SideBar.vue')) as ReturnType<typeof defineComponent>
@@ -16,7 +16,7 @@ const sidebarRelated = reactive<Layout.SidebarRelated>({
   collapsedWidth: '3rem',
 })
 const loading = reactive<Layout.Loading>({
-  logout: false
+  logout: false,
 })
 const keepAlivePages = ref<Layout.keepAlivePages>(new Set())
 
@@ -37,8 +37,10 @@ provide('loading', loading)
 
 <template>
   <ALayout>
-    <ALayoutSider v-if="!_isMobile" v-model:collapsed="sidebarRelated.collapsed" collapsible :trigger="null"
-      :width="sidebarRelated.width" :collapsedWidth="sidebarRelated.collapsedWidth" breakpoint="md">
+    <ALayoutSider
+      v-if="!_isMobile" v-model:collapsed="sidebarRelated.collapsed" collapsible :trigger="null"
+      :width="sidebarRelated.width" :collapsed-width="sidebarRelated.collapsedWidth" breakpoint="md"
+    >
       <div style="relative; z-index: 999; display: flex; flex-direction: column; width: 100%; height: 100%;">
         <RouterLink to="/">
           <div v-if="(sidebarRelated.shadowCollapsed || sidebarRelated.collapsed)" class="flex-center logo-collapsed">
@@ -50,23 +52,24 @@ provide('loading', loading)
           </div>
         </RouterLink>
         <Profile v-if="!sidebarRelated?.collapsed" />
-        <SideBar></SideBar>
+        <SideBar />
       </div>
-      <div v-if="!_isMobile" class="sidebar-shadow"
-        :style="{ transform: `translate3d(${sidebarRelated.shadowCollapsed ? '-10rem' : '0'}, 0, 0)` }">
-      </div>
+      <div
+        v-if="!_isMobile" class="sidebar-shadow"
+        :style="{ transform: `translate3d(${sidebarRelated.shadowCollapsed ? '-10rem' : '0'}, 0, 0)` }"
+      />
     </ALayoutSider>
     <ALayout>
       <ALayoutHeader v-if="fixedHeader">
-        <HeadBar></HeadBar>
+        <HeadBar />
       </ALayoutHeader>
       <ALayoutContent id="content-window">
         <div v-if="!fixedHeader" style="padding: 0 1rem;">
-          <HeadBar></HeadBar>
+          <HeadBar />
         </div>
         <RouterView v-slot="{ Component, route }" class="content-view">
           <Transition :name="transitions.fadeScale" mode="out-in" appear>
-            <!-- 
+            <!--
               vite的hmr和keepalive组件冲突会导致路由失效，
               https://github.com/vuejs/core/pull/5165
               不影响生产环境
@@ -81,12 +84,12 @@ provide('loading', loading)
   </ALayout>
   <Teleport to="body">
     <Transition name="slide-right" mode="out-in" appear>
-      <Shadow v-if="_isMobile && !sidebarRelated.collapsed" @shadowClick="sidebarRelated.collapsed = true">
+      <Shadow v-if="_isMobile && !sidebarRelated.collapsed" @shadow-click="sidebarRelated.collapsed = true">
         <div class="block sidebar-mobile">
           <RouterLink to="/">
             <img :src="Logo" alt="Logo" class="logo">
           </RouterLink>
-          <SideBar></SideBar>
+          <SideBar />
         </div>
       </Shadow>
     </Transition>

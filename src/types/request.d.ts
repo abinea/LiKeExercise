@@ -19,6 +19,5 @@ export interface RegisterForm {
   checkPass: string
   username: string // 实名
   role: -1 | 0 | 1 | 2 // 角色, -1为未选择，0为管理员，1为学生，2为教师
-  avatar?: "" // 头像，有默认
+  avatar?: '' // 头像，有默认
 }
-

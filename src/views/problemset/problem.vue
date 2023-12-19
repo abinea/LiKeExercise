@@ -1,82 +1,98 @@
-<script lang="ts" setup >
-import HeadBar from '@/layout/HeadBar.vue';
-import MonacoEditor from '@/components/MonacoEditor.vue';
-import problemApi from '@/api/problem';
-import solutionApi from '@/api/solution';
-import { Solution } from '@/types/store';
-import { message } from "ant-design-vue"
-import { problemStore, userStore } from '@/store';
-import { formatDate } from "@/utils/formatUtils"
+<script lang="ts" setup>
+import { message } from 'ant-design-vue'
+import HeadBar from '@/layout/HeadBar.vue'
+import MonacoEditor from '@/components/MonacoEditor.vue'
+import problemApi from '@/api/problem'
+import solutionApi from '@/api/solution'
+import type { Solution } from '@/types/store'
+import { problemStore, userStore } from '@/store'
+import { formatDate } from '@/utils/formatUtils'
 
 const route = useRoute()
 const id = Number(route.params.id)
+const isEditing = ref(false)
+const ansVisible = ref(false)
 
 const store = problemStore()
 const uid = computed(() => userStore().userInfo.schoolId)
 const difficultyArr = store.difficultyArr
 
 const editorProps = reactive({
-  width: "60vw",
+  width: '60vw',
   height: '70vh',
   theme: 'light',
-  language: "javascript"
+  language: 'javascript',
 })
 
 const isSolution = ref(false)
 const isCreateSolution = ref(false)
+const solution = ref({
+  title: '',
+  content: '',
+})
 
-const changeSolution = () => isSolution.value = !isSolution.value
-
+const changeSolution = () => (isSolution.value = !isSolution.value)
 
 const solutionList = ref<Solution.solution[]>([])
+const currentCommentUser = ref<Solution.CommentUser[]>([])
+
 const solutionCount = ref(0)
+const currentId = ref(0)
 onBeforeMount(async () => {
   const res = await solutionApi.solutionAll(id)
   solutionList.value = res.solutions
-  solutionCount.value = res.solutionsNumber;
-  currentId.value = res.solutions[0]?.id || 0;
+  solutionCount.value = res.solutionsNumber
+  currentId.value = res.solutions[0]?.id || 0
 })
 
 // 难度样式
 function difficultyColor(difficulty: number) {
   switch (difficulty) {
-    case 1: return "easy"
-    case 2: return "medium"
-    case 3: return "hard"
+    case 1:
+      return 'easy'
+    case 2:
+      return 'medium'
+    case 3:
+      return 'hard'
   }
 }
 
-const currentId = ref(0);
 const currentSolution = ref<Solution.solution>(null)
-watch(() => currentId.value, async (currentVal) => {
-  currentSolution.value = await solutionApi.solutionDetail(id, currentVal)
-  console.log(currentSolution.value);
-  // commentUser
-  currentCommentUser.value = await Promise.all(currentSolution.value.comments.map(async comment => await solutionApi.commentUser(comment.schoolId)))
-  currentCommentUser.value.unshift(await solutionApi.commentUser(currentSolution.value.schoolId))
-  console.log("评论", currentCommentUser.value);
-})
+watch(
+  () => currentId.value,
+  async (currentVal) => {
+    currentSolution.value = await solutionApi.solutionDetail(id, currentVal)
+    // commentUser
+    currentCommentUser.value = await Promise.all(
+      currentSolution.value.comments.map(
+        async comment => await solutionApi.commentUser(comment.schoolId),
+      ),
+    )
+    currentCommentUser.value.unshift(
+      await solutionApi.commentUser(currentSolution.value.schoolId),
+    )
+  },
+)
 
-const changeCurrentId = (val: number) => {
+function changeCurrentId(val: number) {
   currentId.value = val
 }
 
 const problem = reactive({
   id,
   title: '',
-  question: "",
-  category: "选择",
-  courseName: "",
+  question: '',
+  category: '选择',
+  courseName: '',
   difficulty: 1,
   tags: [],
-  ans: "<p><br></p>",
+  ans: '<p><br></p>',
   Cnt: 0,
-  favour: true
+  favour: true,
 })
 
 onBeforeMount(async () => {
   const res = await problemApi.problemDetail(problem.id)
-  console.log('题目', res);
   problem.title = res.title
   problem.question = res.question
   problem.category = res.category
@@ -92,204 +108,259 @@ onBeforeMount(async () => {
 async function handleFavour() {
   if (problem.favour) {
     const res = await problemApi.problemCancelFavour(id)
-    console.log('取消收藏', res);
-    if (res.code == 0) {
-      message.success("取消收藏")
+    if (res.code === 0) {
+      message.success('取消收藏')
       problem.favour = false
     }
-  } else {
+  }
+  else {
     const res = await problemApi.problemFavour(id)
-    console.log('添加收藏', res);
-    if (res.code == 0) {
-      message.success("收藏成功")
+    if (res.code === 0) {
+      message.success('收藏成功')
       problem.favour = true
     }
   }
 }
 
-const handleClose = () => {
+function handleClose() {
   if (isCreateSolution.value) {
     isCreateSolution.value = false
     isEditing.value = false
-    solution.value.title = ""
-    solution.value.content = ""
-  } else {
+    solution.value.title = ''
+    solution.value.content = ''
+  }
+  else {
     isSolution.value = false
   }
 }
 
-const solution = ref({
-  title: "",
-  content: ""
-})
-
-const handleSolution = async () => {
-  if (solution.value.title.trim() == "" || solution.value.content.trim() == "") {
-    message.error("标题或内容不能为空")
-    return
-  } else {
+async function handleSolution() {
+  if (
+    solution.value.title.trim() === ''
+    || solution.value.content.trim() === ''
+  ) {
+    message.error('标题或内容不能为空')
+  }
+  else {
     if (!isEditing.value) {
-      console.log('create');
       await solutionApi.solutionCreate(id, solution.value)
-    } else {
-      console.log("update");
-      await solutionApi.solutionUpdate(id, currentId.value, { ...solution.value, schoolId: uid.value })
     }
+    else {
+      await solutionApi.solutionUpdate(id, currentId.value, {
+        ...solution.value,
+        schoolId: uid.value,
+      })
+    }
+
     const res = await solutionApi.solutionAll(id)
-    if (solutionCount.value == 0) {
+    if (solutionCount.value === 0)
       currentId.value = res.solutions[0]?.id || 0
-    }
+
     solutionList.value = res.solutions
-    solutionCount.value = res.solutionsNumber;
-    currentSolution.value = await solutionApi.solutionDetail(id, currentId.value)
-    currentCommentUser.value = await Promise.all(currentSolution.value.comments.map(async comment => await solutionApi.commentUser(comment.schoolId)))
-    currentCommentUser.value.unshift(await solutionApi.commentUser(currentSolution.value.schoolId))
+    solutionCount.value = res.solutionsNumber
+    currentSolution.value = await solutionApi.solutionDetail(
+      id,
+      currentId.value,
+    )
+    currentCommentUser.value = await Promise.all(
+      currentSolution.value.comments.map(
+        async comment => await solutionApi.commentUser(comment.schoolId),
+      ),
+    )
+    currentCommentUser.value.unshift(
+      await solutionApi.commentUser(currentSolution.value.schoolId),
+    )
     isCreateSolution.value = false
     isEditing.value = false
-    solution.value.title = ""
-    solution.value.content = ""
-    message.success("提交成功")
+    solution.value.title = ''
+    solution.value.content = ''
+    message.success('提交成功')
   }
 }
 
-const answer = ref("")
-const submitCode = async () => {
-  console.log(answer.value);
-  if (answer.value.trim() == "") {
-    message.error("答案不能为空")
+const answer = ref('')
+async function submitCode() {
+  if (answer.value.trim() === '') {
+    message.error('答案不能为空')
     return
   }
   await problemApi.problemCommit(id)
-  message.success("提交成功")
-  if (problem.ans) ansVisible.value = true
+  message.success('提交成功')
+  if (problem.ans)
+    ansVisible.value = true
 }
 
-
 // 评论
-const currentCommentUser = ref<Solution.CommentUser[]>([])
-watch(() => currentCommentUser.value, (newVal) => {
-  console.log("评论", newVal);
-})
-const comment = ref("")
-const handleComment = async () => {
-  if (comment.value.trim() == "") {
-    message.error("评论不能为空")
+
+const comment = ref('')
+async function handleComment() {
+  if (comment.value.trim() === '') {
+    message.error('评论不能为空')
     return
   }
   await solutionApi.commentCreate(id, currentId.value, comment.value)
-  message.success("评论成功")
+  message.success('评论成功')
   currentSolution.value = await solutionApi.solutionDetail(id, currentId.value)
-  currentCommentUser.value = await Promise.all(currentSolution.value.comments.map(async comment => await solutionApi.commentUser(comment.schoolId)))
-  currentCommentUser.value.unshift(await solutionApi.commentUser(currentSolution.value.schoolId))
-  comment.value = ""
+  currentCommentUser.value = await Promise.all(
+    currentSolution.value.comments.map(
+      async comment => await solutionApi.commentUser(comment.schoolId),
+    ),
+  )
+  currentCommentUser.value.unshift(
+    await solutionApi.commentUser(currentSolution.value.schoolId),
+  )
+  comment.value = ''
 }
 
 const currentCommentLength = ref(0)
-watch(() => currentSolution.value, (newVal) => {
-  currentCommentLength.value = newVal.comments.length
-})
-
+watch(
+  () => currentSolution.value,
+  (newVal) => {
+    currentCommentLength.value = newVal.comments.length
+  },
+)
 
 const selectedAnswer = ref([])
-const selectedOptions = ref([{
-  label: 'A. 与目标系统有关的物理实体',
-  value: 'A'
-}, {
-  label: 'B. 与目标系统发生作用和人或组织的角色',
-  value: 'B'
-}, {
-  label: 'C. 目标系统运行中需记忆的事件',
-  value: 'C'
-}, {
-  label: 'D. 目标系统中环境场所的状态',
-  value: 'D'
-}])
-const submitSelect = async () => {
-  if (selectedAnswer.value.length == 0) {
-    message.error("请选择答案")
+const selectedOptions = ref([
+  {
+    label: 'A. 与目标系统有关的物理实体',
+    value: 'A',
+  },
+  {
+    label: 'B. 与目标系统发生作用和人或组织的角色',
+    value: 'B',
+  },
+  {
+    label: 'C. 目标系统运行中需记忆的事件',
+    value: 'C',
+  },
+  {
+    label: 'D. 目标系统中环境场所的状态',
+    value: 'D',
+  },
+])
+async function submitSelect() {
+  if (selectedAnswer.value.length === 0) {
+    message.error('请选择答案')
     return
   }
-  message.success("提交成功")
-  if (problem.ans) ansVisible.value = true
+  message.success('提交成功')
+  if (problem.ans)
+    ansVisible.value = true
 }
 
-const ansVisible = ref(false)
-const handleAnsVisible = () => ansVisible.value = false
+const handleAnsVisible = () => (ansVisible.value = false)
 
 const isRightShow = computed(() => {
   if (problem.category === '选择' || problem.category === '填空') {
     if (isSolution.value) {
-      if (isCreateSolution.value) return true
+      if (isCreateSolution.value) {
+        return true
+      }
       else {
-        if (solutionList.value.length == 0) return false
+        if (solutionList.value.length === 0)
+          return false
         else return true
       }
-    } else {
+    }
+    else {
       return false
     }
-  } else {
+  }
+  else {
     return true
   }
 })
 
-const isEditing = ref(false)
-const handleEdit = () => {
+function handleEdit() {
   solution.value.title = currentSolution.value.title
   solution.value.content = currentSolution.value.content
   isCreateSolution.value = true
   isEditing.value = true
 }
 
-const handleDelete = async () => {
+async function handleDelete() {
   await solutionApi.solutionDetele(id, currentId.value)
   const res = await solutionApi.solutionAll(id)
   solutionList.value = res.solutions
-  solutionCount.value = res.solutionsNumber;
+  solutionCount.value = res.solutionsNumber
   changeCurrentId(res.solutions[0]?.id || 0)
-  message.success("删除成功")
+  message.success('删除成功')
 }
+</script>
 
-</script>    
-<template >
-  <HeadBar :isSingle="true" style="background-color: #f2f4f7;"></HeadBar>
+<template>
+  <HeadBar :is-single="true" style="background-color: #f2f4f7" />
   <div class="detail-page">
     <!-- 题目描述 -->
-    <div class="flex-left" :style="problem?.category === '选择' || problem?.category === '填空' ? 'max-width:60vw' : ''">
-      <section class="widget" style="margin-bottom: 16px;">
+    <div
+      class="flex-left"
+      :style="
+        problem?.category === '选择' || problem?.category === '填空'
+          ? 'max-width:60vw'
+          : ''
+      "
+    >
+      <section class="widget" style="margin-bottom: 16px">
         <div>
-          <h1 style="display:inline-block;">
-            <span style="margin-right: 10px;">{{ problem?.id }}</span>
+          <h1 style="display: inline-block">
+            <span style="margin-right: 10px">{{ problem?.id }}</span>
             <span>{{ problem?.title }}</span>
           </h1>
-          <AButton class="right" style="margin-right: 10px;" @click="changeSolution">{{ isSolution ? "返回题目" : "查看题解" }}
+          <AButton
+            class="right"
+            style="margin-right: 10px"
+            @click="changeSolution"
+          >
+            {{ isSolution ? '返回题目' : '查看题解' }}
           </AButton>
         </div>
         <div class="stat">
           <ASpace size="large">
-            <span :class="difficultyColor(problem?.difficulty)">{{ difficultyArr[problem?.difficulty] }}</span>
+            <span :class="difficultyColor(problem?.difficulty)">{{
+              difficultyArr[problem?.difficulty]
+            }}</span>
             <span>题型：{{ problem.category }}</span>
             <span>课程：{{ problem?.courseName }}</span>
             <span>通过人数：{{ problem.Cnt }}</span>
             <span @click="handleFavour()">
-              <StarFilled class="favour icon" v-if="problem.favour" />
-              <StarOutlined class="favour icon" v-else />
+              <StarFilled v-if="problem.favour" class="favour icon" />
+              <StarOutlined v-else class="favour icon" />
             </span>
           </ASpace>
         </div>
       </section>
       <div v-if="isSolution">
         <section class="widget description">
-          <div class="title">已有题解
-            <span style="margin-right: 20px;font-size: 14px;" @click="() => { isCreateSolution = true }">
+          <div class="title">
+            已有题解
+            <span
+              style="margin-right: 20px; font-size: 14px"
+              @click="
+                () => {
+                  isCreateSolution = true
+                }
+              "
+            >
               <PlusCircleOutlined /> 写题解
             </span>
           </div>
-          <AList :data-source="solutionList" style="width: 100%;">
+          <AList :data-source="solutionList" style="width: 100%">
             <template #renderItem="{ item }">
-              <AListItem class="solution content" @click="changeCurrentId(item.id)" style="cursor: pointer;">
-                <h3 style="font-size:16px;font-weight:500;">{{ item.title }}</h3>
-                <div class="solution-preview">{{ item.content.slice(0, 300).replace(new RegExp(`<\ /?.+?>`, 'g'), ' ')
-                }}
+              <AListItem
+                class="solution content"
+                style="cursor: pointer"
+                @click="changeCurrentId(item.id)"
+              >
+                <h3 style="font-size: 16px; font-weight: 500">
+                  {{ item.title }}
+                </h3>
+                <div class="solution-preview">
+                  {{
+                    item.content
+                      .slice(0, 300)
+                      .replace(new RegExp(`<\ /?.+?>`, 'g'), ' ')
+                  }}
                 </div>
               </AListItem>
             </template>
@@ -299,30 +370,58 @@ const handleDelete = async () => {
       <div v-else>
         <section class="widget description">
           <div>
-            <div class="title">题目描述</div>
-            <RichTextEditor class="content" v-model="problem.question" :readonly="true" :scroll="false" />
+            <div class="title">
+              题目描述
+            </div>
+            <RichTextEditor
+              v-model="problem.question"
+              class="content"
+              :readonly="true"
+              :scroll="false"
+            />
           </div>
           <div v-if="problem?.category === '选择'">
-            <div class="title">题目选项</div>
+            <div class="title">
+              题目选项
+            </div>
             <div class="content">
               <AFormItem>
-                <ACheckboxGroup v-model:value="selectedAnswer" :options="selectedOptions"
-                  style="display: grid;gap: 24px;">
-                </ACheckboxGroup>
+                <ACheckboxGroup
+                  v-model:value="selectedAnswer"
+                  :options="selectedOptions"
+                  style="display: grid; gap: 24px"
+                />
               </AFormItem>
-              <div style="display: flex;justify-content: flex-end;">
-                <AButton type="primary" class="submit-green" @click="submitSelect">提交</AButton>
+              <div style="display: flex; justify-content: flex-end">
+                <AButton
+                  type="primary"
+                  class="submit-green"
+                  @click="submitSelect"
+                >
+                  提交
+                </AButton>
               </div>
             </div>
           </div>
           <div v-else-if="problem?.category === '填空'">
-            <div class="title">题目答案</div>
+            <div class="title">
+              题目答案
+            </div>
             <div class="content">
               <AFormItem>
-                <AInput v-model:value="selectedAnswer" placeholder="请输入答案" />
+                <AInput
+                  v-model:value="selectedAnswer"
+                  placeholder="请输入答案"
+                />
               </AFormItem>
-              <div style="display: flex;justify-content: flex-end;">
-                <AButton type="primary" class="submit-green" @click="submitSelect">提交</AButton>
+              <div style="display: flex; justify-content: flex-end">
+                <AButton
+                  type="primary"
+                  class="submit-green"
+                  @click="submitSelect"
+                >
+                  提交
+                </AButton>
               </div>
             </div>
           </div>
@@ -336,14 +435,31 @@ const handleDelete = async () => {
       </div>
     </div> -->
     <!-- 题目代码 -->
-    <div class="flex-right" v-if="isRightShow">
-      <section v-if="isCreateSolution" class="widget ">
+    <div v-if="isRightShow" class="flex-right">
+      <section v-if="isCreateSolution" class="widget">
         <div class="code">
-          <AButton @click="handleClose">关闭</AButton>
-          <AButton type="primary" danger @click="handleSolution()" class="right">
-            发布题解</AButton>
-          <AInput size="large" v-model:value="solution.title" placeholder="请输入题解标题" style="margin-top: 30px;" />
-          <RichTextEditor style="margin-top: 24px;" placeholder="请输入题解内容" v-model="solution.content" />
+          <AButton @click="handleClose">
+            关闭
+          </AButton>
+          <AButton
+            type="primary"
+            danger
+            class="right"
+            @click="handleSolution()"
+          >
+            发布题解
+          </AButton>
+          <AInput
+            v-model:value="solution.title"
+            size="large"
+            placeholder="请输入题解标题"
+            style="margin-top: 30px"
+          />
+          <RichTextEditor
+            v-model="solution.content"
+            style="margin-top: 24px"
+            placeholder="请输入题解内容"
+          />
         </div>
       </section>
       <section v-else class="widget">
@@ -352,57 +468,133 @@ const handleDelete = async () => {
             <h2>{{ currentSolution?.title }}</h2>
             <ASpace class="subtitlte">
               {{ currentCommentUser[0]?.username }}
-              <ATag v-if="currentCommentUser[0]?.role == 1" color="green" style="font-weight:700;border-radius:10px"> 学生
+              <ATag
+                v-if="currentCommentUser[0]?.role === 1"
+                color="green"
+                style="font-weight: 700; border-radius: 10px"
+              >
+                学生
               </ATag>
-              <ATag v-else color="blue" style="font-weight:700;border-radius:10px"> 老师 </ATag>
-              &nbsp;发布于 {{
-                  formatDate(currentSolution?.createdAt)
-              }}
+              <ATag
+                v-else
+                color="blue"
+                style="font-weight: 700; border-radius: 10px"
+              >
+                老师
+              </ATag>
+              &nbsp;发布于 {{ formatDate(currentSolution?.createdAt) }}
             </ASpace>
-            <ASpace class="right" size="large" style="font-size:12px;color:#8e8e8e"
-              v-if="uid === currentSolution?.schoolId">
+            <ASpace
+              v-if="uid === currentSolution?.schoolId"
+              class="right"
+              size="large"
+              style="font-size: 12px; color: #8e8e8e"
+            >
               <span @click="handleEdit">
                 <EditOutlined class="icon" />修改
               </span>
               <span>
-                <APopconfirm title="确定删除该题解?" ok-text="是" cancel-text="否" @confirm="handleDelete"><delete-outlined
-                    class="icon" />删除</APopconfirm>
+                <APopconfirm
+                  title="确定删除该题解?"
+                  ok-text="是"
+                  cancel-text="否"
+                  @confirm="handleDelete"
+                >
+                  <delete-outlined class="icon" />删除
+                </APopconfirm>
               </span>
             </ASpace>
-            <ADivider style="margin:16px 0"> </ADivider>
-            <RichTextEditor class="solution-content" v-model="currentSolution.content" :readonly="true"
-              :scroll="false" />
-            <ADivider style="margin:16px 0"> </ADivider>
-            <h3 class="title"><span style="font-size: 20px;">{{
-                currentSolution?.comments?.length ? currentSolution?.comments?.length : 0
-            }}</span> 条评论</h3>
+            <ADivider style="margin: 16px 0" />
+            <RichTextEditor
+              v-model="currentSolution.content"
+              class="solution-content"
+              :readonly="true"
+              :scroll="false"
+            />
+            <ADivider style="margin: 16px 0" />
+            <h3 class="title">
+              <span style="font-size: 20px">{{
+                currentSolution?.comments?.length
+                  ? currentSolution?.comments?.length
+                  : 0
+              }}</span>
+              条评论
+            </h3>
             <div class="comment">
-              <ATextarea v-model:value="comment" placeholder="请输入评论内容" :auto-size="{ minRows: 4, maxRows: 7 }" />
-              <div style="display:flex;justify-content: flex-end;">
-                <AButton size="small" type="primary" @click="handleComment"
-                  style="margin-top: 20px;margin-bottom: 20px;" class="submit-green">评论
+              <ATextarea
+                v-model:value="comment"
+                placeholder="请输入评论内容"
+                :auto-size="{ minRows: 4, maxRows: 7 }"
+              />
+              <div style="display: flex; justify-content: flex-end">
+                <AButton
+                  size="small"
+                  type="primary"
+                  style="margin-top: 20px; margin-bottom: 20px"
+                  class="submit-green"
+                  @click="handleComment"
+                >
+                  评论
                 </AButton>
               </div>
-              <div v-if="!currentSolution?.comments.length"
-                style="text-align: center;margin-bottom: 20px;color: #bfbfbf; font-size: 24px;">
+              <div
+                v-if="!currentSolution?.comments.length"
+                style="
+                  text-align: center;
+                  margin-bottom: 20px;
+                  color: #bfbfbf;
+                  font-size: 24px;
+                "
+              >
                 <span>暂无评论</span>
               </div>
               <AList v-else>
-                <template v-for="item, index in currentSolution.comments">
-                  <AListItem style="flex-direction: column;align-items: flex-start;color: #595959;">
-                    <div style="display:flex;justify-content: space-between;width:100%;">
-                      <ASpace style="font-weight: 500;">
+                <template
+                  v-for="(item, index) in currentSolution.comments"
+                  :key="index"
+                >
+                  <AListItem
+                    style="
+                      flex-direction: column;
+                      align-items: flex-start;
+                      color: #595959;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        justify-content: space-between;
+                        width: 100%;
+                      "
+                    >
+                      <ASpace style="font-weight: 500">
                         {{ currentCommentUser[index + 1]?.username }}
-                        <ATag v-if="currentCommentUser[index + 1]?.role == 1" color="green"
-                          style="font-weight:700;border-radius:10px"> 学生 </ATag>
-                        <ATag v-else color="blue" style="font-weight:700;border-radius:10px"> 老师 </ATag>
+                        <ATag
+                          v-if="currentCommentUser[index + 1]?.role === 1"
+                          color="green"
+                          style="font-weight: 700; border-radius: 10px"
+                        >
+                          学生
+                        </ATag>
+                        <ATag
+                          v-else
+                          color="blue"
+                          style="font-weight: 700; border-radius: 10px"
+                        >
+                          老师
+                        </ATag>
                       </ASpace>
 
-                      <span style="color: #bfbfbf;display: flex;align-items: center;">
+                      <span
+                        style="
+                          color: #bfbfbf;
+                          display: flex;
+                          align-items: center;
+                        "
+                      >
                         评论于
-                        <div class="dot"></div>
-                        {{ formatDate(item.createdAt)
-                        }}
+                        <div class="dot" />
+                        {{ formatDate(item.createdAt) }}
                       </span>
                     </div>
                     <div>
@@ -416,11 +608,14 @@ const handleDelete = async () => {
             </div>
           </div>
           <div v-else class="code-content">
-            <div v-if="problem?.category == '代码'">
-              <div class=" code-editor-title">
-                <span style="margin-left:26px">
+            <div v-if="problem?.category === '代码'">
+              <div class="code-editor-title">
+                <span style="margin-left: 26px">
                   <label>语言：</label>
-                  <ASelect v-model:value="editorProps.language" style=" margin-right:30px">
+                  <ASelect
+                    v-model:value="editorProps.language"
+                    style="margin-right: 30px"
+                  >
                     <ASelectOption value="c">C</ASelectOption>
                     <ASelectOption value="cpp">C++</ASelectOption>
                     <ASelectOption value="python">Python</ASelectOption>
@@ -428,31 +623,53 @@ const handleDelete = async () => {
                     <ASelectOption value="typescript">TypeScript</ASelectOption>
                   </ASelect>
                 </span>
-                <span style="margin-left:26px">
+                <span style="margin-left: 26px">
                   <label>主题：</label>
-                  <ASelect v-model:value="editorProps.theme" style="width: 160px">
+                  <ASelect
+                    v-model:value="editorProps.theme"
+                    style="width: 160px"
+                  >
                     <ASelectOption value="light">Visual Studio</ASelectOption>
                     <ASelectOption value="vs-dark">Visual Studio Dark</ASelectOption>
                   </ASelect>
                 </span>
               </div>
               <div class="code-editor">
-                <MonacoEditor :theme="editorProps.theme" :width="editorProps.width" :height="editorProps.height"
-                  :language="editorProps.language" v-model:value="answer" />
-                <ADivider style="margin:16px 0"> </ADivider>
-                <div style="display: flex;justify-content:end;">
-                  <AButton type="primary" @click="submitCode" class="submit-green">
-                    提交</AButton>
+                <MonacoEditor
+                  v-model:value="answer"
+                  :theme="editorProps.theme"
+                  :width="editorProps.width"
+                  :height="editorProps.height"
+                  :language="editorProps.language"
+                />
+                <ADivider style="margin: 16px 0" />
+                <div style="display: flex; justify-content: end">
+                  <AButton
+                    type="primary"
+                    class="submit-green"
+                    @click="submitCode"
+                  >
+                    提交
+                  </AButton>
                 </div>
               </div>
             </div>
             <div v-else>
               <h3>题目答案</h3>
-              <RichTextEditor v-model="answer" placeholder="请输入答案" style="margin-top: 20px;" />
-              <ADivider style="margin:16px 0"> </ADivider>
-              <div style="display: flex;justify-content:end;">
-                <AButton type="primary" @click="submitCode" class="submit-green">
-                  提交</AButton>
+              <RichTextEditor
+                v-model="answer"
+                placeholder="请输入答案"
+                style="margin-top: 20px"
+              />
+              <ADivider style="margin: 16px 0" />
+              <div style="display: flex; justify-content: end">
+                <AButton
+                  type="primary"
+                  class="submit-green"
+                  @click="submitCode"
+                >
+                  提交
+                </AButton>
               </div>
             </div>
           </div>
@@ -461,8 +678,15 @@ const handleDelete = async () => {
     </div>
   </div>
   <!-- 题目答案 -->
-  <AModal v-if="problem.ans != '<p><br></p>' && problem.ans != ''" v-model:visible="ansVisible" @ok="handleAnsVisible"
-    :cancelable="false" title="本题参考答案" :keyboard="true" width="38vw">
+  <AModal
+    v-if="problem.ans !== '<p><br></p>' && problem.ans !== ''"
+    v-model:visible="ansVisible"
+    :cancelable="false"
+    title="本题参考答案"
+    :keyboard="true"
+    width="38vw"
+    @ok="handleAnsVisible"
+  >
     <RichTextEditor v-model="problem.ans" :readonly="true" />
   </AModal>
 </template>
@@ -510,11 +734,10 @@ const handleDelete = async () => {
     background: #dfdfdf;
     opacity: 0;
     transition: opacity 0.3s ease 0s;
-    content: "";
+    content: '';
     position: absolute;
     pointer-events: none;
     box-sizing: border-box;
-
   }
 
   &:hover {
@@ -526,7 +749,6 @@ const handleDelete = async () => {
   }
 
   &::after {
-
     opacity: 1;
     width: 2px;
     height: 2px;
@@ -534,22 +756,18 @@ const handleDelete = async () => {
     display: flex;
     flex-direction: column;
     background: currentcolor;
-    box-shadow: currentcolor 0px 8px 0px,
-      currentcolor 0px 16px 0px,
-      currentcolor 0px 24px 0px,
-      currentcolor 0px 32px 0px,
+    box-shadow: currentcolor 0px 8px 0px, currentcolor 0px 16px 0px,
+      currentcolor 0px 24px 0px, currentcolor 0px 32px 0px,
       currentcolor 0px 40px 0px;
-    transition: background-color 0.3s ease 0s,
-      box-shadow 0.3s ease 0s;
+    transition: background-color 0.3s ease 0s, box-shadow 0.3s ease 0s;
     top: 39.7%;
     left: 50%;
     transform: translateX(-50%);
-    content: "";
+    content: '';
     position: absolute;
     pointer-events: none;
   }
 }
-
 
 .widget {
   background-color: #fff;
@@ -557,7 +775,6 @@ const handleDelete = async () => {
   padding: 20px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
-
 
 .description {
   padding: 0;
@@ -573,7 +790,6 @@ const handleDelete = async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
   }
 
   .content {
@@ -643,4 +859,3 @@ const handleDelete = async () => {
   }
 }
 </style>
-

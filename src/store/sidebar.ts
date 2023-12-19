@@ -1,6 +1,6 @@
-import { dashboardRoute, routes } from "@/router"
-import { ShallowRef } from "vue"
-import type { RouteRecordRaw } from "vue-router"
+import type { ShallowRef } from 'vue'
+import type { RouteRecordRaw } from 'vue-router'
+import { dashboardRoute, routes } from '@/router'
 
 class Sidebar {
   private sidebar: ShallowRef<RouteRecordRaw[]>

@@ -14,9 +14,8 @@ export default function (cb?: Function) {
   function checkIsMobile() {
     const rect = document.body.getBoundingClientRect()
     isMobile.value = rect.width < WIDTH
-    if (isMobile.value) {
+    if (isMobile.value)
       cb && cb()
-    }
   }
   return isMobile
 }

@@ -1,44 +1,34 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "strict": true,
+    "target": "ES2020",
+
     "jsx": "preserve",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
-    "skipLibCheck": true,
-    "noEmit": true,
-    "strictNullChecks": false, // 不检查null和undefined为类型
+    "lib": ["ESNext", "DOM"],
+    "useDefineForClassFields": true, // 不检查null和undefined为类型
     "baseUrl": "./",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
     "paths": {
-      "@": [
-        "src"
-      ],
-      "@/*": [
-        "src/*"
-      ]
-    }
+      "@": ["src"],
+      "@/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "noEmit": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "src/utils/formatTime.js",
-  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
     }
-  ]
+  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["node_modules"]
 }

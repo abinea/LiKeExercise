@@ -1,20 +1,19 @@
 <script lang="ts" setup>
-import { PropType } from 'vue';
-import { formatTerm } from "@/utils/formatUtils"
+import type { PropType } from 'vue'
+import { formatTerm } from '@/utils/formatUtils'
 
-const router = useRouter()
-
-interface ClassInfo {
-  title: string,
-  studentNum: number
-  term: string
-}
 const props = defineProps({
   classInfo: {
     type: Object as PropType<ClassInfo>,
-    required: true
-  }
+    required: true,
+  },
 })
+
+interface ClassInfo {
+  title: string
+  studentNum: number
+  term: string
+}
 const classInfo = props.classInfo
 
 const now = '2022-2023-1'
@@ -22,7 +21,7 @@ const isEnded = computed(() => {
   return classInfo.term < now
 })
 </script>
-    
+
 <template>
   <div class="classInfo" :class="isEnded ? 'ended' : ''">
     <p class="class-item">
@@ -37,7 +36,6 @@ const isEnded = computed(() => {
   </div>
 </template>
 
-
 <style scoped lang="less">
 .classInfo {
   height: 200px;
@@ -48,7 +46,7 @@ const isEnded = computed(() => {
 
   &:hover {
     color: @bold-gray;
-    transition: all .2s ease-in-out 0s;
+    transition: all 0.2s ease-in-out 0s;
     box-shadow: 0 0.125rem 0.625rem rgba(175, 187, 204, 0.5);
   }
 

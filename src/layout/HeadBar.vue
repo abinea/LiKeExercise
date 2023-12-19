@@ -1,18 +1,28 @@
 <script setup lang="ts">
 import type { Layout } from '@/types/layout'
 
+const props = defineProps(
+  {
+    isSingle: {
+      type: Boolean,
+      default: false,
+    },
+  },
+)
 const sidebarRelated = inject<Layout.SidebarRelated>('sidebarRelated')
 const loading = inject<Layout.Loading>('loading')
 const router = useRouter()
 let timeout: NodeJS.Timeout
 
 function logout() {
-  if (loading) loading.logout = true
-  removeCookie("token")
+  if (loading)
+    loading.logout = true
+  removeCookie('token')
   router.replace('/login')
 }
 function toggleSidebar() {
-  if (!sidebarRelated) return
+  if (!sidebarRelated)
+    return
   if (!sidebarRelated.collapsed) {
     sidebarRelated.collapsed = true
     nextTick(() => {
@@ -28,26 +38,18 @@ function toggleSidebar() {
   }
 }
 
-const props = defineProps(
-  {
-    isSingle: {
-      type: Boolean,
-      default: false
-    }
-  }
-)
-
-const navigateBack = () => {
+function navigateBack() {
   router.back()
 }
-
 </script>
 
 <template>
   <header>
     <section>
-      <MenuFoldOutlined v-if="!props.isSingle"
-        :class="['icon-sidebar-trigger', sidebarRelated?.collapsed && 'collapsed']" @click="toggleSidebar" />
+      <MenuFoldOutlined
+        v-if="!props.isSingle"
+        class="icon-sidebar-trigger" :class="[sidebarRelated?.collapsed && 'collapsed']" @click="toggleSidebar"
+      />
       <span v-else style="font-size: 1.125rem;font-weight: 500; margin-left: 1rem;" @click="navigateBack">
         <LeftOutlined /> 返回题库
       </span>

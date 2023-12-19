@@ -1,16 +1,16 @@
-import { MessageResponse } from "@/types/request"
-import { Solution } from "@/types/store"
-import service from "./service"
+import service from './service'
+import type { MessageResponse } from '@/types/request'
+import type { Solution } from '@/types/store'
 
 function solutionAll(
   problemId: number,
   data = {
     offset: 0,
     limit: 6,
-  }
-): Promise<{ solutions: Solution.solution[]; solutionsNumber: number }> {
+  },
+): Promise<{ solutions: Solution.solution[], solutionsNumber: number }> {
   return service({
-    method: "POST",
+    method: 'POST',
     url: `/v1/problem/${problemId}/solution/all`,
     data,
   })
@@ -21,10 +21,10 @@ function solutionCreate(
   data: {
     title: string
     content: string
-  }
+  },
 ): Promise<MessageResponse> {
   return service({
-    method: "POST",
+    method: 'POST',
     url: `/v1/problem/${problemId}/solution`,
     data,
   })
@@ -32,20 +32,20 @@ function solutionCreate(
 
 function solutionDetail(
   problemId: number,
-  solutionId: number
+  solutionId: number,
 ): Promise<Solution.solution> {
   return service({
-    method: "GET",
+    method: 'GET',
     url: `/v1/problem/${problemId}/solution/${solutionId}`,
   })
 }
 
 function solutionDetele(
   problemId: number,
-  solutionId: number
+  solutionId: number,
 ): Promise<MessageResponse> {
   return service({
-    method: "DELETE",
+    method: 'DELETE',
     url: `/v1/problem/${problemId}/solution/${solutionId}`,
   })
 }
@@ -53,10 +53,10 @@ function solutionDetele(
 function commentCreate(
   problemId: number,
   solutionId: number,
-  comment: string
+  comment: string,
 ): Promise<MessageResponse> {
   return service({
-    method: "POST",
+    method: 'POST',
     url: `/v1/problem/${problemId}/solution/${solutionId}/comment`,
     data: {
       content: comment,
@@ -67,33 +67,32 @@ function commentCreate(
 function commentDelete(
   problemId: number,
   solutionId: number,
-  commentId: number
+  commentId: number,
 ): Promise<MessageResponse> {
   return service({
-    method: "DELETE",
+    method: 'DELETE',
     url: `/v1/problem/${problemId}/solution/${solutionId}/comment/${commentId}`,
   })
 }
 
 function commentUser(schoolId: number): Promise<Solution.CommentUser> {
   return service({
-    method: "GET",
+    method: 'GET',
     url: `/user/${schoolId}`,
   })
 }
 
-function solutionUpdate( problemId: number, solutionId: number, data: {
+function solutionUpdate(problemId: number, solutionId: number, data: {
   title: string
-  content: string,
+  content: string
   schoolId: number
-}): Promise<MessageResponse>{
+}): Promise<MessageResponse> {
   return service({
-    method: "PUT",
+    method: 'PUT',
     url: `/v1/problem/${problemId}/solution/${solutionId}`,
-    data
+    data,
   })
 }
-
 
 const solutionApi = {
   solutionAll,

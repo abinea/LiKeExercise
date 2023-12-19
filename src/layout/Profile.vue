@@ -1,3 +1,12 @@
+<script setup lang="ts">
+import { userStore } from '@/store'
+
+const store = userStore()
+const avatar = ref('./src/assets/default.png')
+const username = computed<string>(() =>
+  store.userInfo.username)
+</script>
+
 <template>
   <div class="profile">
     <img :src="avatar" alt="用户头像" class="avatar">
@@ -6,17 +15,7 @@
   <span style="padding:0 38px 0 42px">
     <ADivider />
   </span>
-
 </template>
-
-<script setup lang="ts">
-import { userStore } from '@/store';
-
-const store = userStore()
-const avatar = ref('./src/assets/default.png')
-const username = computed<string>(() =>
-  store.userInfo.username)
-</script>
 
 <style scoped>
 .profile {

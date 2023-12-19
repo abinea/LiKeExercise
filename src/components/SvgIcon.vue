@@ -1,5 +1,5 @@
 <script lang="ts">
-import Icon from "@ant-design/icons-vue"
+import Icon from '@ant-design/icons-vue'
 
 export default defineComponent({
   props: {
@@ -18,10 +18,10 @@ export default defineComponent({
       fill: this.fill,
     }, {
       default: () => [
-        h('use', { 'xlink:href': `#svg-${this.iconName}` })
-      ]
+        h('use', { 'xlink:href': `#svg-${this.iconName}` }),
+      ],
     })
     return h(Icon, { component: svg })
-  }
+  },
 })
 </script>

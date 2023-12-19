@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const props = withDefaults(defineProps<{
   color?: string
   contentCenter?: boolean
@@ -16,12 +15,13 @@ const emit = defineEmits<{
   (e: 'shadowClick'): void
 }>()
 </script>
+
 <template>
   <div class="shadow-wrapper">
-    <div :class="['shadow-content-wrapper', contentCenter && 'flex-center']" @click.self="emit('shadowClick')">
-      <div class="blank-top" @click.self="emit('shadowClick')"></div>
-      <slot></slot>
-      <div class="blank-bottom" @click.self="emit('shadowClick')"></div>
+    <div class="shadow-content-wrapper" :class="[contentCenter && 'flex-center']" @click.self="emit('shadowClick')">
+      <div class="blank-top" @click.self="emit('shadowClick')" />
+      <slot />
+      <div class="blank-bottom" @click.self="emit('shadowClick')" />
     </div>
   </div>
 </template>

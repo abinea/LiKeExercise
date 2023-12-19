@@ -1,42 +1,45 @@
 <script setup lang="ts">
-import type { FormProps } from 'ant-design-vue';
-import { message } from "ant-design-vue"
-import userApi from '@/api/user';
+import type { FormProps } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
+import userApi from '@/api/user'
 
-const router = useRouter();
+const router = useRouter()
 
 // 登录表单
 const resetForm = reactive({
-  email: "",
-  captcha: "",
-  password: ""
+  email: '',
+  captcha: '',
+  password: '',
 })
 
 // 进度条
-const steps = [{
-  title: '验证邮箱',
-}, {
-  title: '重置密码',
-}, {
-  title: '完成',
-}]
+const steps = [
+  {
+    title: '验证邮箱',
+  },
+  {
+    title: '重置密码',
+  },
+  {
+    title: '完成',
+  },
+]
 const current = ref(0)
 const isNext = ref(false)
 
 const count = ref(0)
-let timer: any = null;
+let timer: any = null
 async function handleGetCaptcha() {
   const res = await userApi.resetCaptcha({ email: resetForm.email })
   if (res.code === 0) {
-    message.success("验证码已发送")
+    message.success('验证码已发送')
     count.value = 60
     clearInterval(timer)
     timer = setInterval(() => {
-      if (count.value <= 0) {
+      if (count.value <= 0)
         clearInterval(timer)
-      } else {
+      else
         count.value--
-      }
     }, 1000)
   }
 }
@@ -46,74 +49,111 @@ const resetValid: FormProps['onFinish'] = async () => {
   if (res.code === 0) {
     isNext.value = true
     current.value++
-    message.success("验证成功", 1.5)
+    message.success('验证成功', 1.5)
   }
-  else {
-    return
-  }
-};
+}
 async function reset() {
-  const res = await userApi.resetPassword({ email: resetForm.email, newPasswd: resetForm.password })
-  console.log(res);
+  await userApi.resetPassword({
+    email: resetForm.email,
+    newPasswd: resetForm.password,
+  })
   current.value++
-  await message.loading("重置成功，跳转中...", 0.5)
-  router.push("/login");
+  await message.loading('重置成功，跳转中...', 0.5)
+  router.push('/login')
 }
 
-const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-  console.log(errors);
-};
+const handleFinishFailed: FormProps['onFinishFailed'] = (errors) => {
+  console.error(errors)
+}
 </script>
 
 <template>
   <div class="forget-page page">
     <div class="forget-container">
-      <a class="forget-back" href="#/login">
-        <LeftOutlined /> 返回登录
-      </a>
-      <div class="forget-header">重置密码</div>
-      <AForm class="forget-form" :model="resetForm" @finishFailed="handleFinishFailed">
-        <AFormItem style="padding-bottom: 20px;">
+      <a class="forget-back" href="#/login"> <LeftOutlined /> 返回登录 </a>
+      <div class="forget-header">
+        重置密码
+      </div>
+      <AForm
+        class="forget-form"
+        :model="resetForm"
+        @finish-failed="handleFinishFailed"
+      >
+        <AFormItem style="padding-bottom: 20px">
           <ASteps :current="current" size="small">
-            <AStep v-for="item, index in steps" :key="index" :title="item.title" />
+            <AStep
+              v-for="(item, index) in steps"
+              :key="index"
+              :title="item.title"
+            />
           </ASteps>
         </AFormItem>
         <AFormItem name="email">
-          <AInput size="large" v-model:value="resetForm.email" placeholder="邮箱">
+          <AInput
+            v-model:value="resetForm.email"
+            size="large"
+            placeholder="邮箱"
+          >
             <template #prefix>
               <MailOutlined />
             </template>
           </AInput>
         </AFormItem>
         <AFormItem>
-          <AInput v-if="!isNext" size="large" v-model:value="resetForm.captcha" placeholder="验证码" :maxlength="6">
+          <AInput
+            v-if="!isNext"
+            v-model:value="resetForm.captcha"
+            size="large"
+            placeholder="验证码"
+            :maxlength="6"
+          >
             <template #prefix>
               <LockOutlined />
             </template>
             <template #suffix>
-              <AButton style="border-radius: 8px;" type="default" @click="handleGetCaptcha">
-                {{
-                    count === 0 ?
-                      "获取验证码" :
-                      `${count}秒后重试`
-                }}
+              <AButton
+                style="border-radius: 8px"
+                type="default"
+                @click="handleGetCaptcha"
+              >
+                {{ count === 0 ? '获取验证码' : `${count}秒后重试` }}
               </AButton>
             </template>
           </AInput>
-          <AInputPassword v-else size="large" v-model:value="resetForm.password" type="password" placeholder="密码"
-            :maxlength="8">
+          <AInputPassword
+            v-else
+            v-model:value="resetForm.password"
+            size="large"
+            type="password"
+            placeholder="密码"
+            :maxlength="8"
+          >
             <template #prefix>
               <LockOutlined />
             </template>
           </AInputPassword>
         </AFormItem>
         <AFormItem name="submit">
-          <AButton v-if="!isNext" class="forget-form-button" size="large" type="primary" html-type="submit"
-            @click="resetValid" :disabled="resetForm.email === '' || resetForm.captcha === ''">
+          <AButton
+            v-if="!isNext"
+            class="forget-form-button"
+            size="large"
+            type="primary"
+            html-type="submit"
+            :disabled="resetForm.email === '' || resetForm.captcha === ''"
+            @click="resetValid"
+          >
             下一步
           </AButton>
-          <AButton v-else class="forget-form-button" size="large" type="primary" html-type="submit" @click="reset"
-            :disabled="resetForm.email === '' || resetForm.password === ''">
+          <AButton
+            v-else
+            class="forget-form-button"
+            size="large"
+            type="primary"
+            html-type="submit"
+            :disabled="resetForm.email === '' || resetForm.password === ''"
+            @click="reset"
+          >
             重置
           </AButton>
         </AFormItem>
@@ -121,7 +161,6 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
     </div>
   </div>
 </template>
-
 
 <style scoped lang="less">
 .forget {
@@ -138,7 +177,6 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
     justify-content: center;
     height: 96vh;
   }
-
 
   &-container {
     width: 540px;
@@ -169,6 +207,5 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
       width: 100%;
     }
   }
-
 }
 </style>

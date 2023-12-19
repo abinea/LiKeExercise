@@ -1,221 +1,220 @@
 .ant-layout {
-    height: 100%;
-    background: @layout-background-color;
+  height: 100%;
+  background: @layout-background-color;
 
-    .ant-layout-sider {
-        background-color: @sidebar-background-color;
-        transition: none;
-    }
+  .ant-layout-sider {
+    background-color: @sidebar-background-color;
+    transition: none;
+  }
 
-    .ant-layout-header {
-        background-color: @layout-background-color;
-        height: auto;
-        line-height: unset;
-        padding: 0 1rem;
-        display: flex;
-        flex-direction: column;
-    }
+  .ant-layout-header {
+    background-color: @layout-background-color;
+    height: auto;
+    line-height: unset;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .ant-layout-content {
-        overflow: auto;
-    }
+  .ant-layout-content {
+    overflow: auto;
+  }
 }
 
 .ant-menu {
-    background-color: @theme-color !important;
-    border-right: unset !important;
+  background-color: @theme-color !important;
+  border-right: unset !important;
 
-    .ant-menu-item {
-        display: flex;
-        align-items: center;
-        margin-top: 20px;
+  .ant-menu-item {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
 
-        a {
-            color: @sidebar-font-color;
-        }
-
-        &.ant-menu-item-active {
-            a {
-                color: @sidebar-font-active-color;
-            }
-        }
-
-        .ant-menu-item-icon {
-            font-size: 1.1rem !important;
-            color: @sidebar-font-color;
-        }
-
-        &.ant-menu-item-selected {
-            background: transparent;
-
-            &::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                animation: menuSelected 1s ease;
-                // background: linear-gradient(90deg, #fff 0%, var(--light-blue) 30%, var(--light-blue) 90%, var(--background-color)) 100%;
-                background: @login-background-color;
-            }
-
-            a {
-                color: @sidebar-font-active-color;
-                animation: menuSelectedFont 1s ease-in;
-                position: relative;
-            }
-
-            .ant-menu-item-icon {
-                color: @sidebar-font-active-color;
-                animation: menuSelectedFont 1s ease-in;
-                position: relative;
-            }
-        }
+    a {
+      color: @sidebar-font-color;
     }
+
+    &.ant-menu-item-active {
+      a {
+        color: @sidebar-font-active-color;
+      }
+    }
+
+    .ant-menu-item-icon {
+      font-size: 1.1rem !important;
+      color: @sidebar-font-color;
+    }
+
+    &.ant-menu-item-selected {
+      background: transparent;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        animation: menuSelected 1s ease;
+        // background: linear-gradient(90deg, #fff 0%, var(--light-blue) 30%, var(--light-blue) 90%, var(--background-color)) 100%;
+        background: @login-background-color;
+      }
+
+      a {
+        color: @sidebar-font-active-color;
+        animation: menuSelectedFont 1s ease-in;
+        position: relative;
+      }
+
+      .ant-menu-item-icon {
+        color: @sidebar-font-active-color;
+        animation: menuSelectedFont 1s ease-in;
+        position: relative;
+      }
+    }
+  }
 }
 
 @keyframes menuSelected {
-    from {
-        transform: translateX(30rem);
-    }
+  from {
+    transform: translateX(30rem);
+  }
 
-    to {
-        transform: translateX(0rem);
-    }
+  to {
+    transform: translateX(0rem);
+  }
 }
 
 @keyframes menuSelectedFont {
-    from {
-        color: @sidebar-font-color;
-    }
+  from {
+    color: @sidebar-font-color;
+  }
 
-    to {
-        color: @sidebar-font-active-color;
-    }
+  to {
+    color: @sidebar-font-active-color;
+  }
 }
 
 .ant-menu-inline-collapsed {
-    .ant-menu-item {
-        padding: 0 16px !important;
+  .ant-menu-item {
+    padding: 0 16px !important;
+  }
+
+  .ant-menu-item-icon {
+    line-height: 0 !important;
+  }
+
+  .ant-menu-title-content {
+    transition: none !important;
+    opacity: 0;
+  }
+
+  .ant-menu-submenu-selected {
+    .ant-menu-submenu-title {
+      color: @sidebar-font-active-color;
+
+      .ant-menu-item-icon {
+        color: @sidebar-font-active-color;
+      }
     }
+  }
 
-    .ant-menu-item-icon {
-        line-height: 0 !important;
-    }
-
-    .ant-menu-title-content {
-        transition: none !important;
-        opacity: 0;
-    }
-
-    .ant-menu-submenu-selected {
-        .ant-menu-submenu-title {
-            color: @sidebar-font-active-color;
-
-            .ant-menu-item-icon {
-                color: @sidebar-font-active-color;
-            }
-        }
-    }
-
-    .ant-menu-submenu-arrow {
-        display: none;
-    }
-
+  .ant-menu-submenu-arrow {
+    display: none;
+  }
 }
 
 .ant-menu-item::after {
-    border-right: unset !important;
+  border-right: unset !important;
 }
 
-.ant-menu.ant-menu-inline-collapsed>.ant-menu-item.ant-menu-item-selected {
-    background: transparent;
+.ant-menu.ant-menu-inline-collapsed > .ant-menu-item.ant-menu-item-selected {
+  background: transparent;
 }
 
 .ant-menu-submenu {
+  color: @sidebar-font-color;
+
+  .ant-menu-item-icon {
+    font-size: 1.1rem !important;
     color: @sidebar-font-color;
+  }
 
-    .ant-menu-item-icon {
-        font-size: 1.1rem !important;
-        color: @sidebar-font-color;
+  .ant-menu-submenu-title {
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+
+    .ant-menu-submenu-arrow {
+      animation: fadeIn ease 1s;
     }
+  }
 
-    .ant-menu-submenu-title {
-        padding: 0 16px !important;
-        display: flex !important;
-        align-items: center !important;
+  &.ant-menu-submenu-inline {
+    &.ant-menu-submenu-selected {
+      & > .ant-menu-submenu-title {
+        color: @sidebar-font-active-color;
 
-        .ant-menu-submenu-arrow {
-            animation: fadeIn ease 1s;
+        .ant-menu-item-icon {
+          color: @sidebar-font-active-color;
         }
+      }
     }
+  }
 
-    &.ant-menu-submenu-inline {
-        &.ant-menu-submenu-selected {
-            &>.ant-menu-submenu-title {
-                color: @sidebar-font-active-color;
-
-                .ant-menu-item-icon {
-                    color: @sidebar-font-active-color;
-                }
-            }
-        }
+  &.ant-menu-submenu-popup {
+    .ant-menu {
+      background-color: @sidebar-background-color !important;
     }
-
-    &.ant-menu-submenu-popup {
-        .ant-menu {
-            background-color: @sidebar-background-color !important;
-        }
-    }
+  }
 }
 
-.ant-menu-inline.ant-menu-root .ant-menu-item>.ant-menu-title-content {
-    flex: none;
-    width: 71px;
+.ant-menu-inline.ant-menu-root .ant-menu-item > .ant-menu-title-content {
+  flex: none;
+  width: 71px;
 }
 
 .ant-select {
-    min-width: 6rem;
+  min-width: 6rem;
 }
 
 .ant-table-pagination.ant-pagination {
-    margin: 0.7rem 1rem !important;
+  margin: 0.7rem 1rem !important;
 }
 
 .ant-form-inline {
-    margin-bottom: -0.6rem !important;
+  margin-bottom: -0.6rem !important;
 
-    .ant-form-item {
-        margin-bottom: .6rem !important;
-    }
+  .ant-form-item {
+    margin-bottom: 0.6rem !important;
+  }
 }
 
 .ant-table-wrapper {
-    .ant-spin-blur {
-        .ant-table-body {
-            overflow: hidden;
-        }
+  .ant-spin-blur {
+    .ant-table-body {
+      overflow: hidden;
     }
+  }
 }
 
 .ant-table {
-    background: @white !important;
+  background: @white !important;
 }
 
-.ant-table-thead>tr>th {
-    font-weight: bold !important;
-    color: @gray !important;
+.ant-table-thead > tr > th {
+  font-weight: bold !important;
+  color: @gray !important;
 }
 
-.ant-tabs-top>.ant-tabs-nav::before,
-.ant-tabs-bottom>.ant-tabs-nav::before,
-.ant-tabs-top>div>.ant-tabs-nav::before,
-.ant-tabs-bottom>div>.ant-tabs-nav::before {
-    border-bottom: 0px !important;
+.ant-tabs-top > .ant-tabs-nav::before,
+.ant-tabs-bottom > .ant-tabs-nav::before,
+.ant-tabs-top > div > .ant-tabs-nav::before,
+.ant-tabs-bottom > div > .ant-tabs-nav::before {
+  border-bottom: 0px !important;
 }
 
 .ant-layout-sider {
-    max-width: 20em;
-    min-width: 20em;
-    width: 20rem;
+  max-width: 20em;
+  min-width: 20em;
+  width: 20rem;
 }

@@ -8,7 +8,7 @@ export function setCookie(
   key: string,
   value: string | number,
   expires: number = 0,
-  path: string = "/"
+  path: string = '/',
 ) {
   let cookie = `${key}=${encodeURIComponent(value)};path=${path};`
   if (expires !== 0) {
@@ -24,9 +24,9 @@ export function setCookie(
  * @returns cookie的值
  */
 export function getCookie(key: string) {
-  const reg = new RegExp("(^| )" + encodeURIComponent(key) + "=([^;]+)")
+  const reg = new RegExp(`(^| )${encodeURIComponent(key)}=([^;]+)`)
   const match = document.cookie.match(reg)
-  return match ? decodeURIComponent(match[2]) : ""
+  return match ? decodeURIComponent(match[2]) : ''
 }
 
 /**
@@ -34,5 +34,5 @@ export function getCookie(key: string) {
  * @param key 移除的cookie的键名
  */
 export function removeCookie(key: string) {
-  setCookie(key, "", -1)
+  setCookie(key, '', -1)
 }

@@ -1,88 +1,102 @@
 <script lang="ts" setup>
-import type { UnwrapRef } from 'vue';
-import { FormProps, message } from 'ant-design-vue';
-import { LoginForm } from '@/types/request';
-import { userStore } from "@/store";
-import userApi from '@/api/user';
+import type { UnwrapRef } from 'vue'
+import type { FormProps } from 'ant-design-vue'
+import { message } from 'ant-design-vue'
+import type { LoginForm } from '@/types/request'
+import { userStore } from '@/store'
+import userApi from '@/api/user'
 
 const store = userStore()
-const router = useRouter();
+const router = useRouter()
 
 // 记住密码
-const remember = ref(getStorage('remember') || false);
+const remember = ref(getStorage('remember') || false)
 // 登录表单
 const loginForm: UnwrapRef<LoginForm> = reactive({
-  account: store.userInfo.email||store.userInfo.schoolId|| getStorage("account"),
-  password: store.userInfo.password || (remember.value ? getStorage("password") : ""),
+  account: store.userInfo.email || store.userInfo.schoolId || getStorage('account'),
+  password: store.userInfo.password || (remember.value ? getStorage('password') : ''),
 })
-console.log(store.userInfo.email, store.userInfo.password);
-
 
 const handleFinish: FormProps['onFinish'] = async () => {
   // 记住密码处理
-  setStorage("account", loginForm.account);
-  setStorage("remember", remember.value);
-  if (remember.value) {
-    setStorage('password', loginForm.password);
-  } else {
+  setStorage('account', loginForm.account)
+  setStorage('remember', remember.value)
+  if (remember.value)
+    setStorage('password', loginForm.password)
+  else
     removeStorage('password')
-  }
+
   // 提交数据
   const res = await userApi.login(loginForm)
-  console.log(loginForm);
-  if ("token" in res) {
+  if ('token' in res) {
     setCookie('token', res.token)
-    await message.loading("登陆成功，跳转中...", 0.5)
-    const userInfo=await userApi.info()
+    await message.loading('登陆成功，跳转中...', 0.5)
+    const userInfo = await userApi.info()
     store.setUserInfo(userInfo)
-    router.push("/home");
+    router.push('/home')
   }
-};
-const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
-  console.log(errors);
-};
+}
+const handleFinishFailed: FormProps['onFinishFailed'] = (errors) => {
+  console.error(errors)
+}
 </script>
 
 <template>
   <div class="login-page">
     <div class="login-container">
-      <div class="login-header">用户登录</div>
-      <AForm class="login-form" :model="loginForm" @finish="handleFinish" @finishFailed="handleFinishFailed">
+      <div class="login-header">
+        用户登录
+      </div>
+      <AForm class="login-form" :model="loginForm" @finish="handleFinish" @finish-failed="handleFinishFailed">
         <AFormItem name="account">
-          <AInput size="large" v-model:value="loginForm.account" placeholder="邮箱/学号/教工号">
+          <AInput v-model:value="loginForm.account" size="large" placeholder="邮箱/学号/教工号">
             <template #prefix>
               <UserOutlined />
             </template>
           </AInput>
         </AFormItem>
         <AFormItem name="password">
-          <AInputPassword size="large" v-model:value="loginForm.password" type="password" placeholder="密码"
-            :maxlength="8">
+          <AInputPassword
+            v-model:value="loginForm.password" size="large" type="password" placeholder="密码"
+            :maxlength="8"
+          >
             <template #prefix>
               <LockOutlined />
             </template>
           </AInputPassword>
           <AFormItem style="margin-top: 16px;margin-bottom: 0px;">
-            <ACheckbox v-model:checked="remember">记住密码</ACheckbox>
+            <ACheckbox v-model:checked="remember">
+              记住密码
+            </ACheckbox>
             <div class="right">
-              <RouterLink to="/register">尚未注册?</RouterLink>
+              <RouterLink to="/register">
+                尚未注册?
+              </RouterLink>
               <ADivider type="vertical" />
-              <RouterLink to="/forget">忘记密码?</RouterLink>
+              <RouterLink to="/forget">
+                忘记密码?
+              </RouterLink>
             </div>
           </AFormItem>
         </AFormItem>
         <AFormItem>
-          <AButton class="login-form-button" size="large" type="primary" html-type="submit"
-            :disabled="loginForm.account === '' || loginForm.password === ''">
+          <AButton
+            class="login-form-button" size="large" type="primary" html-type="submit"
+            :disabled="loginForm.account === '' || loginForm.password === ''"
+          >
             登录
           </AButton>
         </AFormItem>
       </AForm>
       <p class="agreement">
         登录即表示同意平台
-        <RouterLink to="/404">《隐私政策》</RouterLink>
+        <RouterLink to="/404">
+          《隐私政策》
+        </RouterLink>
         和
-        <RouterLink to="/404">《用户协议》</RouterLink>
+        <RouterLink to="/404">
+          《用户协议》
+        </RouterLink>
       </p>
     </div>
   </div>
@@ -90,7 +104,6 @@ const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
     <p>荔课网练 2022</p>
   </div>
 </template>
-
 
 <style scoped lang="less">
 .login {

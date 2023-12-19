@@ -8,7 +8,7 @@ const props = withDefaults(defineProps<{
   height?: string | number
   tag?: string
   direction?: 'horizontal' | 'vertical'
-  initOptions?: Options,
+  initOptions?: Options
   speed?: number
   minHeight?: string | number
 }>(), {
@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<{
   direction: 'vertical',
   initOptions: undefined,
   speed: 1,
-  minHeight: 'unset'
+  minHeight: 'unset',
 })
 
 const scrollbar = shallowRef<OverlayScrollbars | null>(null)
@@ -28,7 +28,8 @@ onMounted(() => {
   try {
     scrollbar.value = OverlayScrollbars(scrollbarDom.value as HTMLElement, Object.assign(getDirectionOptions(), props.initOptions || {}))
     listenWheel()
-  } catch (e) {
+  }
+  catch (e) {
     console.error(e)
   }
 })
@@ -38,30 +39,32 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
-  scrollbar: scrollbar
+  scrollbar,
 })
 
 function listenWheel() {
-  scrollbarDom.value.addEventListener('wheel', (e) => onWheel(e as WheelEvent))
+  scrollbarDom.value.addEventListener('wheel', e => onWheel(e as WheelEvent))
 }
 
 function onWheel(e: WheelEvent): void {
   const viewport = scrollbar.value?.getElements().viewport
   const states = scrollbar.value?.getState()
 
-  if (
-    (states?.hasOverflow.x && props.direction === 'horizontal') ||
-    (states?.hasOverflow.y && props.direction === 'vertical')
-  ) {
+  const horizontalCanScroll = states?.hasOverflow.x && props.direction === 'horizontal'
+  const verticalCanScroll = states?.hasOverflow.y && props.direction === 'vertical'
+
+  if (horizontalCanScroll || verticalCanScroll) {
     // 阻止浏览器默认滚动行为
     e.preventDefault()
   }
 
-  const scrollOffset = (viewport && (
-    props.direction === 'horizontal' ? viewport.scrollLeft : viewport.scrollTop) || 0) + ((e.deltaY || 0) / 4 * props.speed)
+  const scrollOffset = (viewport
+    ? (
+        props.direction === 'horizontal' ? viewport.scrollLeft : viewport.scrollTop)
+    : 0) + ((e.deltaY || 0) / 4 * props.speed)
   scrollbar.value?.scroll({
     x: props.direction === 'horizontal' ? scrollOffset : 0,
-    y: props.direction === 'vertical' ? scrollOffset : 0
+    y: props.direction === 'vertical' ? scrollOffset : 0,
   }, 30)
 }
 
@@ -71,13 +74,13 @@ function getDirectionOptions(): Options {
     case 'vertical':
       options = {
         scrollbars: { autoHide: 'leave', autoHideDelay: 500 },
-        overflowBehavior: { x: 'hidden', y: 'scroll' }
+        overflowBehavior: { x: 'hidden', y: 'scroll' },
       }
       break
     case 'horizontal':
       options = {
         scrollbars: { autoHide: 'leave', autoHideDelay: 500 },
-        overflowBehavior: { x: 'scroll', y: 'hidden' }
+        overflowBehavior: { x: 'scroll', y: 'hidden' },
       }
       break
   }
@@ -86,8 +89,10 @@ function getDirectionOptions(): Options {
 </script>
 
 <template>
-  <component ref="scrollbarDom" :is="props.tag" :class="['scrollbar', `scrollbar-${props.direction}`]"
-    :style="{ width: props.width, height: props.height, minHeight: props.minHeight }">
+  <component
+    :is="props.tag" ref="scrollbarDom" class="scrollbar" :class="[`scrollbar-${props.direction}`]"
+    :style="{ width: props.width, height: props.height, minHeight: props.minHeight }"
+  >
     <slot />
   </component>
 </template>

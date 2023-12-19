@@ -1,55 +1,56 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router"
-import Layout from "@/layout/index.vue"
+import type { RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import {
-  TeamOutlined,
   FormOutlined,
-  ScheduleOutlined,
   MessageOutlined,
-  UserOutlined,
+  ScheduleOutlined,
   StarOutlined,
-} from "@ant-design/icons-vue"
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons-vue'
+import Layout from '@/layout/index.vue'
 
 export const dashboardRoute: RouteRecordRaw = {
-  path: "/",
+  path: '/',
   component: Layout,
-  redirect: "/home",
+  redirect: '/home',
   meta: { breadcrumb: false },
   children: [
     {
-      path: "/home",
-      component: () => import("@/views/Home.vue"),
+      path: '/home',
+      component: () => import('@/views/Home.vue'),
       meta: {
-        title: "我的班级",
+        title: '我的班级',
         icon: TeamOutlined,
       },
     },
     {
-      path: "/problem",
-      component: () => import("@/views/problemset/index.vue"),
-      meta: { title: "查看题库", icon: ScheduleOutlined },
+      path: '/problem',
+      component: () => import('@/views/problemset/index.vue'),
+      meta: { title: '查看题库', icon: ScheduleOutlined },
     },
     {
-      path: "/edit",
-      name: "EditProblem",
-      component: () => import("@/views/edit/index.vue"),
-      meta: { title: "编辑题目", icon: FormOutlined },
+      path: '/edit',
+      name: 'EditProblem',
+      component: () => import('@/views/edit/index.vue'),
+      meta: { title: '编辑题目', icon: FormOutlined },
     },
     {
-      path: "/notice",
-      component: () => import("@/views/notice/index.vue"),
-      meta: { title: "消息通知", icon: MessageOutlined },
+      path: '/notice',
+      component: () => import('@/views/notice/index.vue'),
+      meta: { title: '消息通知', icon: MessageOutlined },
     },
     {
-      path: "/profile",
-      component: () => import("@/views/profile/index.vue"),
-      meta: { title: "个人信息", icon: UserOutlined },
+      path: '/profile',
+      component: () => import('@/views/profile/index.vue'),
+      meta: { title: '个人信息', icon: UserOutlined },
     },
     {
-      path: "/favor",
-      component: () => import("@/views/favor/index.vue"),
+      path: '/favor',
+      component: () => import('@/views/favor/index.vue'),
       meta: {
         hidden: true,
-        title: "收藏夹",
+        title: '收藏夹',
         icon: StarOutlined,
       },
     },
@@ -58,49 +59,49 @@ export const dashboardRoute: RouteRecordRaw = {
 
 export const routes: RouteRecordRaw[] = [
   {
-    path: "/problem/:id",
-    component: () => import("@/views/problemset/problem.vue"),
-    meta: { hidden: true, title: "题目详情", keepAlive: true },
+    path: '/problem/:id',
+    component: () => import('@/views/problemset/problem.vue'),
+    meta: { hidden: true, title: '题目详情', keepAlive: true },
   },
 ]
 
 const baseRoutes: RouteRecordRaw[] = [
   {
-    path: "/login",
+    path: '/login',
     meta: {
       hidden: true,
-      title: "登陆页面",
+      title: '登陆页面',
     },
-    component: () => import("@/views/Login.vue"),
+    component: () => import('@/views/Login.vue'),
   },
   {
-    path: "/forget",
+    path: '/forget',
     meta: {
       hidden: true,
-      title: "重置密码",
+      title: '重置密码',
     },
-    component: () => import("@/views/Forget.vue"),
+    component: () => import('@/views/Forget.vue'),
   },
   {
-    path: "/register",
+    path: '/register',
     meta: {
       hidden: true,
-      title: "注册页面",
+      title: '注册页面',
     },
-    component: () => import("@/views/Register.vue"),
+    component: () => import('@/views/Register.vue'),
   },
   // 404必须放在最后兜底
   {
-    path: "/404",
+    path: '/404',
     meta: {
       hidden: true,
-      title: "不存在",
+      title: '不存在',
     },
-    component: () => import("@/views/404.vue"),
+    component: () => import('@/views/404.vue'),
   },
   {
-    path: "/:pathMatch(.*)*",
-    redirect: "/404",
+    path: '/:pathMatch(.*)*',
+    redirect: '/404',
   },
 ]
 

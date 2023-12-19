@@ -14,13 +14,13 @@ export namespace User {
 }
 
 export namespace Problem {
-  type Tag = {
+  interface Tag {
     tagName: string
   }
 
-  type Order = {
+  interface Order {
     orderBy: string
-    sortOrder: "DESC" | "ASC" | ""
+    sortOrder: 'DESC' | 'ASC' | ''
   }
 
   interface problem {
@@ -29,7 +29,7 @@ export namespace Problem {
     title: string // 题目标题
     question: string // 题目内容
     courseName: string // 课程
-    category: "选择" | "填空" | "大题" | "代码" | "" // 题目类型
+    category: '选择' | '填空' | '大题' | '代码' | '' // 题目类型
     difficulty: 0 | 1 | 2 | 3 // 难度，0-用于筛选全部，1-简单，2-中等，3-困难
     tags: Tag[] | [] // 题目标签
     Cnt: number // 通过人数

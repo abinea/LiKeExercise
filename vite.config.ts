@@ -1,12 +1,12 @@
-import { defineConfig } from "vite"
-import vue from "@vitejs/plugin-vue"
-import path from "node:path"
+import path from 'node:path'
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
 
-import AutoImport from "unplugin-auto-import/vite"
-import Components from "unplugin-vue-components/vite"
-import { AntDesignVueResolver } from "unplugin-vue-components/resolvers"
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers'
 
-const resolve = (dir) => path.resolve(__dirname, dir)
+const resolve = dir => path.resolve(__dirname, dir)
 
 export default defineConfig({
   plugins: [
@@ -18,9 +18,9 @@ export default defineConfig({
         /\.vue$/,
         /\.vue\?vue/, // .vue
       ],
-      imports: ["vue", "vue-router", "pinia"],
-      dirs: ["src/utils"],
-      dts: "src/auto-imports.d.ts",
+      imports: ['vue', 'vue-router', 'pinia'],
+      dirs: ['src/utils'],
+      dts: 'src/auto-imports.d.ts',
     }),
     // 自动导入使用组件
     Components({
@@ -32,22 +32,22 @@ export default defineConfig({
         }),
       ],
       // 自定义组件 自动导入
-      dirs: "src/components",
-      extensions: ["vue"],
-      dts: "src/components.d.ts",
+      dirs: 'src/components',
+      extensions: ['vue'],
+      dts: 'src/components.d.ts',
     }),
   ],
   css: {
     preprocessorOptions: {
       less: {
         modifyVars: {
-          hack: `true; @import "${resolve("src/styles/variable.less")}";`,
+          hack: `true; @import "${resolve('src/styles/variable.less')}";`,
         },
         additionalData: `
-        @import "${resolve("src/styles/global.less")}";
-        @import "${resolve("src/styles/animation.less")}";
-        @import "${resolve("src/styles/transtion.less")}";
-        @import "${resolve("src/styles/antdv.less")}";
+        @import "${resolve('src/styles/global.less')}";
+        @import "${resolve('src/styles/animation.less')}";
+        @import "${resolve('src/styles/transtion.less')}";
+        @import "${resolve('src/styles/antdv.less')}";
         `,
         javascriptEnabled: true,
       },
@@ -55,7 +55,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": resolve("./src"),
+      '@': resolve('./src'),
     },
   },
 })

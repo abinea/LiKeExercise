@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import locale from "ant-design-vue/es/locale/zh_CN"
+import locale from 'ant-design-vue/es/locale/zh_CN'
 </script>
 
 <template>
@@ -7,6 +7,7 @@ import locale from "ant-design-vue/es/locale/zh_CN"
     <RouterView />
   </AConfigProvider>
 </template>
+
 <style lang="less">
 #app {
   width: 100vw;
