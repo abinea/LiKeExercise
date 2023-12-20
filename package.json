@@ -2,12 +2,13 @@
   "name": "lekou-web",
   "type": "module",
   "version": "0.0.0",
-  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "oxlint": "npx oxlint@latest"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
@@ -18,17 +19,18 @@
     "ant-design-vue": "^3.2.20",
     "axios": "^1.6.2",
     "echarts": "^5.4.3",
+    "js-cookie": "^3.0.5",
     "less": "^4.2.0",
     "nprogress": "^0.2.0",
     "overlayscrollbars": "^1.13.3",
     "pathe": "^0.3.9",
     "pinia": "^2.1.7",
-    "vite-plugin-compression": "^0.5.1",
     "vue": "^3.3.13",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@types/echarts": "^4.9.22",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^18.19.3",
     "@types/nprogress": "^0.2.3",
     "@types/overlayscrollbars": "^1.12.5",
@@ -38,6 +40,7 @@
     "unplugin-auto-import": "^0.11.5",
     "unplugin-vue-components": "^0.22.12",
     "vite": "^3.2.7",
+    "vite-plugin-compression": "^0.5.1",
     "vue-tsc": "^1.8.25"
   }
 }

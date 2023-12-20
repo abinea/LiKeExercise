@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Cookies from 'js-cookie'
 import type { Layout } from '@/types/layout'
 
 const props = defineProps({
@@ -15,7 +16,7 @@ let timeout: NodeJS.Timeout
 function logout() {
   if (loading)
     loading.logout = true
-  removeCookie('token')
+  Cookies.remove('token')
   router.replace('/login')
 }
 function toggleSidebar() {

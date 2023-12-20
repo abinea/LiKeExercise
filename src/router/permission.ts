@@ -1,6 +1,7 @@
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { message } from 'ant-design-vue'
+import Cookies from 'js-cookie'
 import router from './index'
 import { appTitle } from '@/store/appConfig'
 import { userStore } from '@/store'
@@ -22,10 +23,10 @@ router.beforeEach(async (to, from, next) => {
   }
   else {
     // 判断是否有token
-    const token = getCookie('token')
+    const token = Cookies.get('token')
     if (!token) {
       message.error('token失效，请重新登录')
-      removeCookie('token') // 清除cookie
+      Cookies.remove('token') // 清除cookie
       next('/login')
     }
     else {

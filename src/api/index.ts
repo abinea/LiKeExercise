@@ -1,6 +1,7 @@
 import { message } from 'ant-design-vue'
 import 'ant-design-vue/lib/message/style/css'
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API,
@@ -9,7 +10,7 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (req) => {
-    const token = getCookie('token')
+    const token = Cookies.get('token')
     if (req.headers && token)
       req.headers.Authorization = `Bearer ${token}`
 

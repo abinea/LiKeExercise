@@ -2,8 +2,9 @@
 import type { UnwrapRef } from 'vue'
 import type { FormProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import type { LoginForm } from '@/types/request'
+import Cookies from 'js-cookie'
 import { userStore } from '@/store'
+import type { LoginForm } from '@/types/request'
 
 const store = userStore()
 const router = useRouter()
@@ -28,7 +29,7 @@ const handleFinish: FormProps['onFinish'] = async () => {
   // 提交数据
   const res = await login(loginForm)
   if ('token' in res) {
-    setCookie('token', res.token)
+    Cookies.set('token', res.token)
     await message.loading('登陆成功，跳转中...', 0.5)
     const info = await userInfo()
     store.setUserInfo(info)
